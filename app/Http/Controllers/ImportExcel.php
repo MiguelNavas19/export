@@ -13,5 +13,8 @@ class ImportExcel extends Controller
 
     Excel::import(new ExportacionImport, $request->file('file'));
 
+    return redirect('/dashboard')->with('status', 'Excel procesado con exito');
+
+
     }
 }

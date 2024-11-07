@@ -1,3 +1,10 @@
+
+@session('status')
+<div class="font-medium text-sm text-lime-600">
+    {{ $value }}
+</div>
+@endsession
+
 <form action="{{ route('imports') }}" method="POST" enctype="multipart/form-data">
     @csrf
 <div class="bg-gray-200 dark:bg-gray-800 bg-opacity-25 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 p-6 lg:p-8">
@@ -18,6 +25,6 @@
 </div>
 </form>
 
-<div class="bg-gray-200 dark:bg-gray-800 bg-opacity-25 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 p-6 lg:p-8">
-<livewire:export-table />
+<div class="grid grid-cols-1  gap-6 lg:gap-8 p-6 lg:p-8">
+<livewire:export-table  />
 </div>

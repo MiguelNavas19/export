@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Exports\ExportInfo;
 use App\Models\Estatus;
 use App\Models\exportacion;
 use App\Models\Tipo;
@@ -11,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\Views\Filters\DateRangeFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\TextFilter;
 use Livewire\Attributes\On;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ExportTable extends DataTableComponent
 {
@@ -68,6 +70,11 @@ class ExportTable extends DataTableComponent
 
             return [];
         });
+
+
+        $this->setBulkActions([
+            'export' => 'Exportar',
+        ]);
     }
 
     public function columns(): array
@@ -200,6 +207,16 @@ class ExportTable extends DataTableComponent
                 }),
 
         ];
+    }
+
+
+    public function export()
+    {
+        $id = $this->getSelected();
+
+        $this->clearSelected();
+
+        return Excel::download(new ExportInfo($id), 'datosexportacion.xlsx');
     }
 
 

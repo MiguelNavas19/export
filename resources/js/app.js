@@ -12,3 +12,8 @@ window.editar = function (id){
     window.dispatchEvent(event);
 
 }
+
+
+Livewire.on('datosActualizados', () => {
+    location.reload(); // Recargar la página
+});

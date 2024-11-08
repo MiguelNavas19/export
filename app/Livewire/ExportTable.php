@@ -15,24 +15,23 @@ use Livewire\Attributes\On;
 class ExportTable extends DataTableComponent
 {
 
+
     #[On('cambio')]
     public function cambioestatus($valor, $id, $tipo)
     {
 
-        if($tipo == 'envio'){
-            Exportacion::where('id',$id)->update([
+        if ($tipo == 'envio') {
+            Exportacion::where('id', $id)->update([
                 'envio' => $valor
             ]);
         }
 
 
-        if($tipo == 'estatus'){
-            Exportacion::where('id',$id)->update([
+        if ($tipo == 'estatus') {
+            Exportacion::where('id', $id)->update([
                 'estatus' => $valor
             ]);
         }
-
-
     }
 
 
@@ -77,13 +76,13 @@ class ExportTable extends DataTableComponent
             Column::make('id')->excludeFromColumnSelect()->hideIf(true)
                 ->sortable(),
             Column::make('expediente')->collapseAlways(),
-            Column::make('consignatario')
+            Column::make('consignatario')->secondaryHeader($this->getFilterByKey('consignatario'))
                 ->sortable(),
-            Column::make('bl')
+            Column::make('bl')->secondaryHeader($this->getFilterByKey('bl'))
                 ->sortable(),
             Column::make('tipo')->collapseAlways()
                 ->sortable(),
-            Column::make('contenedor')
+            Column::make('contenedor')->secondaryHeader($this->getFilterByKey('contenedor'))
                 ->sortable(),
             Column::make('eta')
                 ->secondaryHeader($this->getFilterByKey('fecha'))
@@ -97,11 +96,11 @@ class ExportTable extends DataTableComponent
             Column::make('envio')
                 ->sortable()
                 ->format(function ($value, $row) {
-                                       $resultados = Tipo::query()
+                    $resultados = Tipo::query()
                         ->orderByRaw("id = ? DESC", [$row->envio])
                         ->get();
 
-                  return view('livewire.estatus', [
+                    return view('livewire.estatus', [
                         'options' => $resultados,
                         'valor' => 'envio',
                         'id' => $row->id,
@@ -122,6 +121,16 @@ class ExportTable extends DataTableComponent
                     ]);
                 }),
             Column::make('obs')->secondaryHeader($this->getFilterByKey('obs'))->collapseAlways(),
+
+            Column::make('Actions')->label(
+                fn($row, Column $column) => view('livewire.estatus', [
+                    'valor' => 'BOTON',
+                    'id' => $row->id,
+                ])
+            ),
+
+
+
         ];
     }
 
@@ -149,6 +158,22 @@ class ExportTable extends DataTableComponent
                     $builder->where('cliente', 'like', '%' . $value . '%');
                 }),
 
+            TextFilter::make('consignatario')
+                ->config([
+                    'placeholder' => 'Buscar consignatario',
+                ])
+                ->filter(function (Builder $builder, string $value) {
+                    $builder->where('consignatario', 'like', '%' . $value . '%');
+                }),
+
+            TextFilter::make('contenedor')
+                ->config([
+                    'placeholder' => 'Buscar contenedor',
+                ])
+                ->filter(function (Builder $builder, string $value) {
+                    $builder->where('contenedor', 'like', '%' . $value . '%');
+                }),
+
             TextFilter::make('Motonave')
                 ->config([
                     'placeholder' => 'Buscar Motonave',
@@ -156,6 +181,15 @@ class ExportTable extends DataTableComponent
                 ->filter(function (Builder $builder, string $value) {
                     $builder->where('motonave', 'like', '%' . $value . '%');
                 }),
+
+            TextFilter::make('Bl')
+                ->config([
+                    'placeholder' => 'Buscar BL',
+                ])
+                ->filter(function (Builder $builder, string $value) {
+                    $builder->where('bl', 'like', '%' . $value . '%');
+                }),
+
 
             TextFilter::make('obs')
                 ->config([
@@ -171,7 +205,7 @@ class ExportTable extends DataTableComponent
 
     public function builder(): Builder
     {
-        $query = Exportacion::query()->where('estatus','!=','3');
+        $query = Exportacion::query()->where('estatus', '!=', 3);
 
         // Debugging
         logger('Query before applying filters:', [$query->toSql()]);

@@ -11,31 +11,10 @@ use Rappasoft\LaravelLivewireTables\Views\Column;
 use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\Views\Filters\DateRangeFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\TextFilter;
-use Livewire\Attributes\On;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ExportTable extends DataTableComponent
 {
-
-
-    #[On('cambio')]
-    public function cambioestatus($valor, $id, $tipo)
-    {
-
-        if ($tipo == 'envio') {
-            Exportacion::where('id', $id)->update([
-                'envio' => $valor
-            ]);
-        }
-
-
-        if ($tipo == 'estatus') {
-            Exportacion::where('id', $id)->update([
-                'estatus' => $valor
-            ]);
-        }
-    }
-
 
     public function configure(): void
     {
@@ -74,6 +53,7 @@ class ExportTable extends DataTableComponent
 
         $this->setBulkActions([
             'export' => 'Exportar',
+            'updatemasivo' => 'Actualizar',
         ]);
     }
 
@@ -103,28 +83,27 @@ class ExportTable extends DataTableComponent
             Column::make('envio')
                 ->sortable()
                 ->format(function ($value, $row) {
-                    $resultados = Tipo::query()
+                    $resultadoss = Tipo::query()
                         ->orderByRaw("id = ? DESC", [$row->envio])
                         ->get();
 
                     return view('livewire.estatus', [
-                        'options' => $resultados,
-                        'valor' => 'envio',
+                        'options' => $resultadoss,
+                        'valor' => 'tenvio',
                         'id' => $row->id,
-                        'actual' => $row->envio,
+                        'actual' => $value,
                     ]);
                 }),
             Column::make('estatus')
                 ->sortable()
                 ->format(function ($value, $row) {
-                    $resultados = Estatus::query()
-                        ->orderByRaw("id = ? DESC", [$row->estatus])
-                        ->get();
+
+
                     return view('livewire.estatus', [
-                        'options' => $resultados,
-                        'valor' => 'estatus',
+                        'options' => Estatus::orderByRaw("id = ? DESC", [$value])->get(),
+                        'valor' => 'testatus',
                         'id' => $row->id,
-                        'actual' => $row->estatus,
+                        'actual' => $value,
                     ]);
                 }),
             Column::make('obs')->secondaryHeader($this->getFilterByKey('obs'))->collapseAlways(),
@@ -215,17 +194,29 @@ class ExportTable extends DataTableComponent
         $id = $this->getSelected();
 
         $this->clearSelected();
+        if(count($id) > 0){
+            return Excel::download(new ExportInfo($id), 'datosexportacion.xlsx');
 
-        return Excel::download(new ExportInfo($id), 'datosexportacion.xlsx');
+        }
     }
+
+
+
+    public function updatemasivo()
+    {
+        $id = $this->getSelected();
+
+        if(count($id) > 0){
+            $this->dispatch('editarmasivamente', $id);
+        }
+    }
+
 
 
     public function builder(): Builder
     {
-        $query = Exportacion::query()->where('estatus', '!=', 3);
-
-        // Debugging
-        logger('Query before applying filters:', [$query->toSql()]);
+        $query = Exportacion::query()->where('estatus', '!=', 3)->orderby('motonave','ASC')
+        ->orderby('cliente','ASC')->orderby('eta','ASC');
 
         return $query;
     }

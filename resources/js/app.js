@@ -14,6 +14,13 @@ window.editar = function (id){
 }
 
 
+window.editarmasivamente = function (id){
+    const event = new CustomEvent('editarmasivamente', { detail: { id: id } });
+    window.dispatchEvent(event);
+
+}
+
+
 Livewire.on('datosActualizados', () => {
     location.reload(); // Recargar la página
 });

@@ -58,6 +58,7 @@ class ExportacionImport implements ToCollection
                             "linea" => $rows[9],
                             "envio" => $rows[10],
                             "estatus" => $rows[11],
+                            "liberacion" => $rows[12],
                         ]);
                         $c++;
                     }

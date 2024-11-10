@@ -112,6 +112,10 @@ exportacion::where('id',$this->idex)->update([
             Exportacion::where('id', $id)->update([
                 'estatus' => $valor
             ]);
+        } elseif ($tipo == 'liberacion') {
+            Exportacion::where('id', $id)->update([
+                'liberacion' => $valor
+            ]);
         }
     }
 

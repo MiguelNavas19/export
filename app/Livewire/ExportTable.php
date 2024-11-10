@@ -106,6 +106,21 @@ class ExportTable extends DataTableComponent
                         'actual' => $value,
                     ]);
                 }),
+
+                Column::make('liberacion')
+                ->sortable()
+                ->format(function ($value, $row) {
+
+
+                    return view('livewire.estatus', [
+                        'valor' => 'tliberacion',
+                        'id' => $row->id,
+                        'actual' => $value,
+                    ]);
+                }),
+
+
+
             Column::make('obs')->secondaryHeader($this->getFilterByKey('obs'))->collapseAlways(),
 
             Column::make('Actions')->label(

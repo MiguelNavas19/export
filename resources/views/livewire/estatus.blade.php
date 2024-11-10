@@ -17,6 +17,26 @@
     @endif
 
 
+    @if ($valor == 'tliberacion')
+        <div x-data="{ selectedva: '', id: '{{ $id }}', tipo: 'liberacion' }">
+            <select x-model="selectedva" x-on:change="cambioestatus(selectedva, id, tipo)"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-24 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                @if ($actual == 0)
+                    <option value="0">No</option>
+                    <option value="1">Si</option>
+                @elseif ($actual == 1)
+                <option value="1">Si</option>
+                <option value="0">No</option>
+
+                @endif
+
+            </select>
+        </div>
+    @endif
+
+
+
+
     @if ($valor == 'testatus')
         <div x-data="{ selectedva: '', id: '{{ $id }}', tipo: 'estatus' }">
             <select x-model="selectedva" x-on:change="cambioestatus(selectedva, id, tipo)"
@@ -30,6 +50,9 @@
             </select>
         </div>
     @endif
+
+
+
     @if ($valor == 'BOTON')
         <div x-data="{ id: '{{ $id }}' }">
             <button @click="editar('{{ $id }}')"

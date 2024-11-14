@@ -19,7 +19,7 @@ class ExportInfo implements FromView
     {
 
         return view('export.exportinfo',[
-            'exportacion' => exportacion::whereIn('id', $this->id)->get()
+            'exportacion' => exportacion::whereIn('id', $this->id)->orderby('eta','ASC')->orderby('motonave','ASC')->orderby('cliente','ASC')->get()
         ]);
     }
 

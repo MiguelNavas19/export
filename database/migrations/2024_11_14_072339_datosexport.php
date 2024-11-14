@@ -9,10 +9,10 @@ return new class extends Migration
 
     public function up(): void
     {
-        Schema::create('exportacion', function (Blueprint $table) {
+        Schema::create('datosexport', function (Blueprint $table) {
             $table->id();
-            $table->string('expediente')->nullable();
-            $table->string('consignatario');
+            $table->string('id_export');
+            $table->string('peso')->nullable();
             $table->string('bl');
             $table->string('tipo')->nullable();
             $table->string('contenedor')->nullable();
@@ -31,9 +31,6 @@ return new class extends Migration
 
     public function down(): void
     {
-
-        Schema::dropIfExists('exportacion');
-
-
+        Schema::dropIfExists('datosexport');
     }
 };

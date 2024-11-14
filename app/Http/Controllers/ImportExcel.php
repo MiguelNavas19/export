@@ -10,10 +10,22 @@ class ImportExcel extends Controller
 {
     public function imports(Request $request){
 
+        try {
+            // Supongamos que $import es el resultado de la importación
+            $import = new ExportacionImport;
+            Excel::import($import, $request->file('excel'));
+            $mensaje = "Registros cargados con exito ".$import->c." <br> no se cargaron ".$import->e." registros";
+            return response()->json([
+                'success' => true,
+                'message' => $mensaje, // Mensaje que quieres mostrar en la alerta
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al subir el archivo: ' . $e->getMessage()
+            ], 500);
+        }
 
-    Excel::import(new ExportacionImport, $request->file('file'));
-
-    return redirect('/dashboard')->with('status', 'Excel procesado con exito');
 
 
     }

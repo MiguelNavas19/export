@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\Views\Filters\DateRangeFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\TextFilter;
 use Maatwebsite\Excel\Facades\Excel;
+use Livewire\Attributes\On;
 
 class ExportTable extends DataTableComponent
 {
@@ -74,49 +75,25 @@ class ExportTable extends DataTableComponent
             Column::make('eta')
                 ->secondaryHeader($this->getFilterByKey('fecha'))
                 ->sortable(),
+
             Column::make('motonave')->secondaryHeader($this->getFilterByKey('motonave'))
                 ->sortable(),
+
             Column::make('cliente')->secondaryHeader($this->getFilterByKey('cliente'))
                 ->sortable(),
+
             Column::make('linea')
+
                 ->sortable()->collapseAlways(),
-            Column::make('envio')
-                ->sortable()
-                ->format(function ($value, $row) {
-                    $resultadoss = Tipo::query()
-                        ->orderByRaw("id = ? DESC", [$row->envio])
-                        ->get();
 
-                    return view('livewire.estatus', [
-                        'options' => $resultadoss,
-                        'valor' => 'tenvio',
-                        'id' => $row->id,
-                        'actual' => $value,
-                    ]);
-                }),
-            Column::make('estatus')
-                ->sortable()
-                ->format(function ($value, $row) {
+            Column::make('envio', 'tipoenvio.nombre')->secondaryHeader($this->getFilterByKey('envio'))
+                ->sortable(),
+            Column::make('estatus', 'tipoestatus.nombre')->secondaryHeader($this->getFilterByKey('estatus'))
+                ->sortable(),
 
-
-                    return view('livewire.estatus', [
-                        'options' => Estatus::orderByRaw("id = ? DESC", [$value])->get(),
-                        'valor' => 'testatus',
-                        'id' => $row->id,
-                        'actual' => $value,
-                    ]);
-                }),
-
-                Column::make('liberacion')
-                ->sortable()
-                ->format(function ($value, $row) {
-
-
-                    return view('livewire.estatus', [
-                        'valor' => 'tliberacion',
-                        'id' => $row->id,
-                        'actual' => $value,
-                    ]);
+            Column::make('liberacion')->secondaryHeader($this->getFilterByKey('liberacion'))
+                ->sortable()->format(function ($value) {
+                    return $value == 1 ? 'Sí' : 'No';
                 }),
 
 
@@ -200,6 +177,39 @@ class ExportTable extends DataTableComponent
                     $builder->where('obs', 'like', '%' . $value . '%');
                 }),
 
+            TextFilter::make('envio')
+                ->config([
+                    'placeholder' => 'Buscar envio',
+                ])
+                ->filter(function (Builder $builder, string $value) {
+                    $builder->whereHas('tipoenvio', function ($query) use ($value) {
+                        $query->where('nombre', 'like', '%' . $value . '%'); // Cambia 'nombre' al campo correspondiente en tu tabla tipoenvio
+                    });
+                }),
+
+            TextFilter::make('estatus')
+                ->config([
+                    'placeholder' => 'Buscar estatus',
+                ])
+                ->filter(function (Builder $builder, string $value) {
+                    $builder->whereHas('tipoestatus', function ($query) use ($value) {
+                        $query->where('nombre', 'like', '%' . $value . '%'); // Cambia 'nombre' al campo correspondiente en tu tabla tipoenvio
+                    });
+                }),
+
+            TextFilter::make('liberacion')
+                ->config([
+                    'placeholder' => 'Buscar liberacion',
+                ])
+                ->filter(function (Builder $builder, string $value) {
+
+                    if (strcasecmp($value, 'SI') == 0) {
+                        $builder->where('liberacion', true);
+                    } else {
+                        $builder->where('liberacion', false)->orwhere('liberacion', null);
+                    }
+                }),
+
         ];
     }
 
@@ -209,9 +219,8 @@ class ExportTable extends DataTableComponent
         $id = $this->getSelected();
 
         $this->clearSelected();
-        if(count($id) > 0){
+        if (count($id) > 0) {
             return Excel::download(new ExportInfo($id), 'datosexportacion.xlsx');
-
         }
     }
 
@@ -221,17 +230,17 @@ class ExportTable extends DataTableComponent
     {
         $id = $this->getSelected();
 
-        if(count($id) > 0){
+        if (count($id) > 0) {
             $this->dispatch('editarmasivamente', $id);
         }
     }
 
 
-
+    #[On('datosActualizados')]
     public function builder(): Builder
     {
-        $query = Exportacion::query()->where('estatus', '!=', 3)->orderby('motonave','ASC')
-        ->orderby('cliente','ASC')->orderby('eta','ASC');
+        $query = Exportacion::query()->where('estatus', '!=', 3)->orderby('eta', 'ASC')->orderby('motonave', 'ASC')
+            ->orderby('cliente', 'ASC');
 
         return $query;
     }

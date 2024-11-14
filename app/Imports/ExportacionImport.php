@@ -45,7 +45,7 @@ class ExportacionImport implements ToCollection
 
                 if (isset($rows[1], $rows[2], $rows[8]) && $rows[1] !== '' && $rows[2] !== '' && $rows[8] !== '') {
 
-                    $consulta = exportacion::where('consignatario',$rows[1])->orwhere('bl',$rows[2])
+                    $consulta = exportacion::where('consignatario',$rows[1])->where('bl',$rows[2])
                     ->where('cliente',$rows[8])->get();
 
                     if (count($consulta) == 0) {

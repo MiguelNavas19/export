@@ -147,7 +147,7 @@ class ExportTable extends DataTableComponent
                 ->filter(function (Builder $builder, string $value) {
                     $builder->where('consignatario', 'like', '%' . $value . '%');
                 }),
-                
+
                   TextFilter::make('expediente')
                 ->config([
                     'placeholder' => 'Buscar expediente',
@@ -155,7 +155,7 @@ class ExportTable extends DataTableComponent
                 ->filter(function (Builder $builder, string $value) {
                     $builder->where('expediente', 'like', '%' . $value . '%');
                 }),
-            
+
             TextFilter::make('contenedor')
                 ->config([
                     'placeholder' => 'Buscar contenedor',
@@ -261,10 +261,10 @@ class ExportTable extends DataTableComponent
     public function builder(): Builder
     {
         $query = Exportacion::query()->where(function ($query) {
-                        
+
                                 $query->wherenotin('estatus',[3])
                                 ->ORwhere('estatus',null);
-                          
+
                         })
         ->orderby('eta', 'ASC')->orderby('motonave', 'ASC')
             ->orderby('cliente', 'ASC')->orderby('consignatario', 'ASC');

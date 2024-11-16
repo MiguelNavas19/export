@@ -71,7 +71,31 @@ Livewire.on('alertamensaje', function(icono) {
       });
 });
 
-window.nuevocliente = function (id) {
+window.nuevocliente = function () {
     const event = new CustomEvent("nuevocliente");
     window.dispatchEvent(event);
 };
+
+
+window.infocerrado = function () {
+    const event = new CustomEvent("infocerrado");
+    window.dispatchEvent(event);
+};
+
+
+window.dateRange = function () {
+    return {
+        desde: '',
+        hasta: '',
+        minHasta: '',
+
+        updateHasta() {
+            if (this.desde) {
+                this.minHasta = this.desde;
+            } else {
+                this.minHasta = '';
+                this.hasta = ''; // Reset 'hasta' if 'desde' is cleared
+            }
+        }
+    }
+}

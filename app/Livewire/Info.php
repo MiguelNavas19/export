@@ -75,7 +75,7 @@ class Info extends Component
                                 $query->where('estatus', '!=', 3)
                                 ->orWhere('estatus', null);
                         })->where('id', $id)->first();
-                        
+
         $this->motonave = $query->motonave;
         $this->expediente = $query->expediente;
         $this->consignatario = $query->consignatario;
@@ -177,7 +177,6 @@ class Info extends Component
     {
 
         $this->reset(['renuncia','motonave', 'expediente', 'consignatario', 'bl', 'tipo', 'contenedor', 'eta', 'obs', 'cliente', 'linea', 'enviomodal', 'estatusmodal', 'liberacion']);
-
         $this->nuevocliente = true;
         $this->masivo = false;
         $this->opensave = true;

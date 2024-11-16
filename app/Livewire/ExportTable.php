@@ -3,9 +3,8 @@
 namespace App\Livewire;
 
 use App\Exports\ExportInfo;
-use App\Models\Estatus;
+use App\Exports\ReportExport;
 use App\Models\exportacion;
-use App\Models\Tipo;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 use Illuminate\Database\Eloquent\Builder;
@@ -55,6 +54,7 @@ class ExportTable extends DataTableComponent
         $this->setBulkActions([
             'export' => 'Exportar',
             'updatemasivo' => 'Actualizar',
+            'exportcarpeta' => 'Plantilla carpeta',
         ]);
     }
 
@@ -63,7 +63,8 @@ class ExportTable extends DataTableComponent
         return [
             Column::make('id')->excludeFromColumnSelect()->hideIf(true)
                 ->sortable(),
-            Column::make('expediente')->collapseAlways(),
+            Column::make('expediente')->secondaryHeader($this->getFilterByKey('expediente'))
+                ->sortable(),
             Column::make('consignatario')->secondaryHeader($this->getFilterByKey('consignatario'))
                 ->sortable(),
             Column::make('bl')->secondaryHeader($this->getFilterByKey('bl'))
@@ -99,6 +100,9 @@ class ExportTable extends DataTableComponent
 
 
             Column::make('obs')->secondaryHeader($this->getFilterByKey('obs'))->collapseAlways(),
+
+            Column::make('renuncia')->collapseAlways(),
+
 
             Column::make('Actions')->label(
                 fn($row, Column $column) => view('livewire.estatus', [
@@ -143,7 +147,15 @@ class ExportTable extends DataTableComponent
                 ->filter(function (Builder $builder, string $value) {
                     $builder->where('consignatario', 'like', '%' . $value . '%');
                 }),
-
+                
+                  TextFilter::make('expediente')
+                ->config([
+                    'placeholder' => 'Buscar expediente',
+                ])
+                ->filter(function (Builder $builder, string $value) {
+                    $builder->where('expediente', 'like', '%' . $value . '%');
+                }),
+            
             TextFilter::make('contenedor')
                 ->config([
                     'placeholder' => 'Buscar contenedor',
@@ -220,11 +232,20 @@ class ExportTable extends DataTableComponent
 
         $this->clearSelected();
         if (count($id) > 0) {
-            return Excel::download(new ExportInfo($id), 'datosexportacion.xlsx');
+            return Excel::download(new ExportInfo($id,'general'), 'datosexportacion.xlsx');
         }
     }
 
 
+    public function exportcarpeta()
+    {
+        $id = $this->getSelected();
+
+        $this->clearSelected();
+        if (count($id) > 0) {
+            return Excel::download(new ReportExport($id), 'plantillacarpeta.xlsx');
+        }
+    }
 
     public function updatemasivo()
     {
@@ -239,8 +260,14 @@ class ExportTable extends DataTableComponent
     #[On('datosActualizados')]
     public function builder(): Builder
     {
-        $query = Exportacion::query()->where('estatus', '!=', 3)->orderby('eta', 'ASC')->orderby('motonave', 'ASC')
-            ->orderby('cliente', 'ASC');
+        $query = Exportacion::query()->where(function ($query) {
+                        
+                                $query->wherenotin('estatus',[3])
+                                ->ORwhere('estatus',null);
+                          
+                        })
+        ->orderby('eta', 'ASC')->orderby('motonave', 'ASC')
+            ->orderby('cliente', 'ASC')->orderby('consignatario', 'ASC');
 
         return $query;
     }

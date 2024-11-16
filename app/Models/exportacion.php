@@ -9,7 +9,7 @@ class exportacion extends Model
 
     protected $table = 'exportacion';
     protected $fillable = [
-        'expediente', 'consignatario', 'bl','tipo','contenedor','eta','obs','motonave','cliente','linea','envio','estatus','liberacion'
+        'expediente', 'renuncia', 'consignatario', 'bl','tipo','contenedor','eta','obs','motonave','cliente','linea','envio','estatus','liberacion'
     ];
 
     public function tipoenvio(){

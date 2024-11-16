@@ -10,6 +10,7 @@ use Livewire\Attributes\On;
 use Illuminate\Support\Facades\DB;
 use Exception;
 use Carbon\Carbon;
+use Illuminate\Validation\Rule;
 
 class Info extends Component
 {
@@ -18,18 +19,17 @@ class Info extends Component
     public $motonave = '';
     public $expediente = '';
     public $consignatario = '';
+    public $renuncia = '';
     public $bl = '';
     public $tipo = '';
     public $contenedor = '';
     public $eta = '';
     public $obs = '';
-    public $cliente = '';
+    public $cliente = "";
     public $linea = '';
-    public $enviomodal = 0;
-    public $estatusmodal = 0;
-    public $liberacion = 0;
-    public $qenvio;
-    public $qestatus;
+    public $enviomodal;
+    public $estatusmodal;
+    public $liberacion;
     public $idex;
 
     public $masivo = false;
@@ -38,13 +38,44 @@ class Info extends Component
     public $etamas = '';
 
 
+
+    public function rules()
+    {
+        return [
+            'expediente' => Rule::unique('exportacion'),
+            'bl' => 'required|'.Rule::unique('exportacion'),
+            'cliente' => 'required',
+            'consignatario' => 'required',
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'bl.required' => 'El BL es requerido',
+            'bl.unique' => 'BL ya se encuentra registrado',
+            'expediente.unique' => 'expediente ya se encuentra registrado',
+            'cliente.required' => 'El cliente es requerido',
+            'consignatario.required' => 'El consignatario es requerido',
+        ];
+    }
+
+
+
     #[On('editar')]
     public function editar($id)
     {
+
+        $this->reset(['renuncia','motonave', 'expediente', 'consignatario', 'bl', 'tipo', 'contenedor', 'eta', 'obs', 'cliente', 'linea', 'enviomodal', 'estatusmodal', 'liberacion']);
+
         $this->masivo = false;
         $this->nuevocliente = false;
         $this->opensave = true;
-        $query = exportacion::where('estatus', '!=', 3)->where('id', $id)->first();
+        $query = exportacion::where(function ($query) {
+                                $query->where('estatus', '!=', 3)
+                                ->orWhere('estatus', null);
+                        })->where('id', $id)->first();
+                        
         $this->motonave = $query->motonave;
         $this->expediente = $query->expediente;
         $this->consignatario = $query->consignatario;
@@ -55,20 +86,18 @@ class Info extends Component
         $this->obs = $query->obs;
         $this->cliente = $query->cliente;
         $this->linea = $query->linea;
+        $this->liberacion = $query->liberacion;
         $this->enviomodal = $query->envio;
         $this->estatusmodal = $query->estatus;
-        $this->liberacion = $query->liberacion;
-
-
+        $this->renuncia = $query->renuncia;
         $this->idex = $id;
 
-        $this->qenvio = Tipo::orderByRaw("id = ? DESC", [$this->enviomodal])->get();
-        $this->qestatus = Estatus::orderByRaw("id = ? DESC", [$this->estatusmodal])->get();
     }
 
 
     public function actualizardatos()
     {
+
         //$this->validate();
         DB::beginTransaction();
         try {
@@ -86,6 +115,7 @@ class Info extends Component
                 'envio' => $this->enviomodal,
                 'estatus' => $this->estatusmodal,
                 'liberacion' => $this->liberacion,
+                'renuncia' => $this->renuncia,
             ]);
 
             $this->opensave = false;
@@ -94,7 +124,7 @@ class Info extends Component
             $this->dispatch('datosActualizados');
         } catch (Exception $e) {
             DB::rollBack();
-            // $this->dispatch('alert', 'error',  'Error', $e->getMessage());
+            $this->dispatch('alertamensaje', 'error',  'Error', $e->getMessage());
         }
     }
 
@@ -146,21 +176,18 @@ class Info extends Component
     public function nuevocliente()
     {
 
-        $this->reset(['motonave', 'expediente', 'consignatario', 'bl', 'tipo', 'contenedor', 'eta', 'obs', 'cliente', 'linea', 'enviomodal', 'estatusmodal', 'liberacion']);
+        $this->reset(['renuncia','motonave', 'expediente', 'consignatario', 'bl', 'tipo', 'contenedor', 'eta', 'obs', 'cliente', 'linea', 'enviomodal', 'estatusmodal', 'liberacion']);
 
         $this->nuevocliente = true;
         $this->masivo = false;
         $this->opensave = true;
-
-        $this->qenvio = Tipo::get();
-        $this->qestatus = Estatus::get();
     }
 
 
 
     public function ingresarnuevo()
     {
-        //$this->validate();
+        $this->validate();
         DB::beginTransaction();
         try {
 
@@ -184,8 +211,18 @@ class Info extends Component
                 $fecha = null;
             }
 
+            $consulta = exportacion::where(function ($query) {
+                            if(isset($this->expediente) && $this->expediente !== ''){
+                                $query->where('bl', $this->bl)
+                                ->orWhere('expediente', $this->expediente);
+                            }else{
+                                $query->where('bl', $this->bl);
+                            }
+                        })
+                        ->get();
 
-          $exp =  exportacion::Create([
+        if(count($consulta) == 0){
+            $exp =  exportacion::Create([
                 'motonave' =>  $this->motonave,
                 'expediente' => $this->expediente,
                 'consignatario' => $this->consignatario,
@@ -199,12 +236,19 @@ class Info extends Component
                 'envio' => $this->enviomodal,
                 'estatus' => $this->estatusmodal,
                 'liberacion' => $this->liberacion,
+                'renuncia' => $this->renuncia,
             ]);
 
             $this->opensave = false;
             DB::commit();
 
             $this->dispatch('alertamensaje', 'success',  'Exito', 'Cliente registrado');
+        }else{
+            $this->dispatch('alertamensaje', 'error',  'Error', 'BL o Expediente ya registrados');
+            DB::rollBack();
+        }
+
+
         } catch (Exception $e) {
             DB::rollBack();
             $this->dispatch('alertamensaje', 'error',  'Error', $e->getMessage());
@@ -214,6 +258,11 @@ class Info extends Component
 
     public function render()
     {
-        return view('livewire.info');
+
+        $qenvio = Tipo::get();
+        $qestatus = Estatus::get();
+
+
+        return view('livewire.info',compact('qenvio','qestatus'));
     }
 }

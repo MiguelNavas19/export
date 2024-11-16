@@ -45,8 +45,21 @@ class ExportacionImport implements ToCollection
 
                 if (isset($rows[1], $rows[2], $rows[8]) && $rows[1] !== '' && $rows[2] !== '' && $rows[8] !== '') {
 
-                    $consulta = exportacion::where('consignatario',$rows[1])->where('bl',$rows[2])
-                    ->where('cliente',$rows[8])->get();
+
+                   $consulta = exportacion::where(function ($query) use ($rows) {
+                            if(isset($rows[0]) && $rows[0] !== ''){
+                                $query->where('bl', $rows[2])
+                                ->orWhere('expediente', $rows[0]);
+                            }else{
+                                $query->where('bl', $rows[2]);
+                            }
+                        })
+                        ->get();
+
+                        $liberacion = False;
+                        if (strcasecmp($rows[12], 'SI') == 0) {
+                            $liberacion = True;
+                        }
 
                     if (count($consulta) == 0) {
                         exportacion::create([
@@ -62,20 +75,16 @@ class ExportacionImport implements ToCollection
                             "linea" => $rows[9],
                             "envio" => $rows[10],
                             "estatus" => $rows[11],
-                             "liberacion" => $rows[12],
+                            "liberacion" => $liberacion,
+                            "renuncia" => $rows[13],
                         ]);
                         $c++;
-                    }else{
+                    } else {
                         $e++;
                     }
-
-
-                }else{
+                } else {
                     $e++;
                 }
-
-
-
             }
 
             $i++;

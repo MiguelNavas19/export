@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('obs')->nullable();
             $table->string('motonave')->nullable();
             $table->string('cliente');
+            $table->string('renuncia')->nullable();
             $table->string('linea')->nullable();
             $table->integer('envio')->default(0)->nullable();
             $table->integer('estatus')->default(0)->nullable();

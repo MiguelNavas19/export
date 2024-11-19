@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Exports\ExportInfo;
 use App\Exports\ReportExport;
 use App\Models\exportacion;
+use Carbon\Carbon;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 use Illuminate\Database\Eloquent\Builder;
@@ -56,6 +57,19 @@ class ExportTable extends DataTableComponent
             'updatemasivo' => 'Actualizar',
             'exportcarpeta' => 'Plantilla carpeta',
         ]);
+
+
+        $this->setTrAttributes(function($row, $index) {
+            $date = Carbon::now();
+
+            if ($row->updated_at->format('Y-m-d') == $date->format('Y-m-d')) {
+                return [
+                    'class' => 'dark:bg-gray-900 bg-gray-500', // Color para estado activo
+                ];
+            }
+
+            return [];
+        });
     }
 
     public function columns(): array
@@ -102,7 +116,7 @@ class ExportTable extends DataTableComponent
             Column::make('obs')->secondaryHeader($this->getFilterByKey('obs'))->collapseAlways(),
 
             Column::make('renuncia')->collapseAlways(),
-
+            Column::make('ultima actualizacion','updated_at')->collapseAlways(),
 
             Column::make('Actions')->label(
                 fn($row, Column $column) => view('livewire.estatus', [

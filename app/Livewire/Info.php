@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\Bitacora;
 use App\Models\Estatus;
 use App\Models\exportacion;
 use App\Models\Tipo;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Exception;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 
 class Info extends Component
 {
@@ -101,6 +103,12 @@ class Info extends Component
         //$this->validate();
         DB::beginTransaction();
         try {
+
+            if(empty($this->eta) OR is_null($this->eta)){
+                $this->eta = null;
+            }
+            $antes =  exportacion::where('id', $this->idex)->first();
+
             exportacion::where('id', $this->idex)->update([
                 'motonave' =>  $this->motonave,
                 'expediente' => $this->expediente,
@@ -117,6 +125,15 @@ class Info extends Component
                 'liberacion' => $this->liberacion,
                 'renuncia' => $this->renuncia,
             ]);
+
+
+            $despues =  exportacion::where('id', $this->idex)->first();
+            Bitacora::Create([
+                'id_usuario' =>  Auth::user()->id,
+                'antes' => $antes,
+                'despues' => $despues
+            ]);
+
 
             $this->opensave = false;
             DB::commit();
@@ -177,6 +194,7 @@ class Info extends Component
     {
 
         $this->reset(['renuncia','motonave', 'expediente', 'consignatario', 'bl', 'tipo', 'contenedor', 'eta', 'obs', 'cliente', 'linea', 'enviomodal', 'estatusmodal', 'liberacion']);
+
         $this->nuevocliente = true;
         $this->masivo = false;
         $this->opensave = true;
@@ -236,6 +254,29 @@ class Info extends Component
                 'estatus' => $this->estatusmodal,
                 'liberacion' => $this->liberacion,
                 'renuncia' => $this->renuncia,
+            ]);
+
+            $databitacora = json_encode([
+                'motonave' =>  $this->motonave,
+                'expediente' => $this->expediente,
+                'consignatario' => $this->consignatario,
+                'bl' => $this->bl,
+                'tipo' => $this->tipo,
+                'contenedor' => $this->contenedor,
+                'eta' => $fecha,
+                'obs' => $this->obs,
+                'cliente' => $this->cliente,
+                'linea' => $this->linea,
+                'envio' => $this->enviomodal,
+                'estatus' => $this->estatusmodal,
+                'liberacion' => $this->liberacion,
+                'renuncia' => $this->renuncia,
+            ]);
+
+            Bitacora::Create([
+                'id_usuario' =>  Auth::user()->id,
+                'antes' => 'nuevo registro',
+                'despues' => $databitacora
             ]);
 
             $this->opensave = false;

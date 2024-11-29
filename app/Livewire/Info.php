@@ -111,7 +111,7 @@ class Info extends Component
         DB::beginTransaction();
         try {
 
-            if (empty($this->eta) or is_null($this->eta)) {
+            if(empty($this->eta) OR is_null($this->eta)){
                 $this->eta = null;
             }
             $antes =  exportacion::where('id', $this->idex)->first();
@@ -200,8 +200,7 @@ class Info extends Component
     public function nuevocliente()
     {
 
-        $this->reset(['renuncia', 'motonave', 'expediente', 'consignatario', 'bl', 'tipo', 'contenedor', 'eta', 'obs', 'cliente', 'linea', 'enviomodal', 'estatusmodal', 'liberacion']);
-
+        $this->reset(['renuncia','motonave', 'expediente', 'consignatario', 'bl', 'tipo', 'contenedor', 'eta', 'obs', 'cliente', 'linea', 'enviomodal', 'estatusmodal', 'liberacion']);
         $this->nuevocliente = true;
         $this->masivo = false;
         $this->opensave = true;

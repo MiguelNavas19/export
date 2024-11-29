@@ -99,3 +99,39 @@ window.dateRange = function () {
         }
     }
 }
+
+
+window.eliminar = function (id) {
+
+    Swal.fire({
+        title: "¿Seguro?",
+        text: "Desea eliminar este registro?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Si, Continuar!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const event = new CustomEvent("eliminar", { detail: { id: id } });
+            window.dispatchEvent(event);
+        }
+    });
+
+};
+
+
+window.pdfbl = function (id) {
+    const event = new CustomEvent("pdfbl", { detail: { id: id } });
+    window.dispatchEvent(event);
+};
+
+
+Livewire.on('errormensaje', function(icono) {
+    Swal.fire({
+        icon: icono[0],
+        title: icono[1],
+        html: icono[2],
+
+    })
+});

@@ -14,7 +14,7 @@ use Rappasoft\LaravelLivewireTables\Views\Filters\TextFilter;
 use Maatwebsite\Excel\Facades\Excel;
 use Livewire\Attributes\On;
 
-class ExportTable extends DataTableComponent
+class ExportTableClosed extends DataTableComponent
 {
 
     public function configure(): void
@@ -262,27 +262,14 @@ class ExportTable extends DataTableComponent
         }
     }
 
-  /*  public function updatemasivo()
-    {
-        $id = $this->getSelected();
-
-        if (count($id) > 0) {
-            $this->dispatch('editarmasivamente', $id);
-        }
-    }*/
-
-
     #[On('datosActualizados')]
     public function builder(): Builder
     {
-        $query = Exportacion::query()->where(function ($query) {
-
-                                $query->wherenotin('estatus',[3])
-                                ->ORwhere('estatus',null);
-
-                        })
-        ->orderby('eta', 'ASC')->orderby('motonave', 'ASC')
-            ->orderby('cliente', 'ASC')->orderby('consignatario', 'ASC');
+        $query = Exportacion::query()->where('estatus',[3])
+        ->orderby('eta', 'ASC')
+        ->orderby('motonave', 'ASC')
+        ->orderby('cliente', 'ASC')
+        ->orderby('consignatario', 'ASC');
 
         return $query;
     }

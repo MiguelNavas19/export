@@ -6,11 +6,12 @@
             <th>CONSIGNATARIO</th>
             <th>RENUNCIA</th>
             <th>BL</th>
-             <th>CONTENEDOR</th>
+            <th>CONTENEDOR</th>
             <th>TIPO</th>
             <th>ETA</th>
             <th>MOTONAVE</th>
-             <th>LINEA/ CONSOLIDADOR</th>
+            <th>LINEA / CONSOLIDADOR</th>
+            <th>PUERTO</th>
             <th>OBSERVACIONES</th>
             <th>ENVIO</th>
             <th>ESTATUS</th>
@@ -22,7 +23,7 @@
     <tbody>
         @foreach ($exportacion as $datos)
             <tr>
-                 <td> {{ $datos->cliente }}</td>
+                <td> {{ $datos->cliente }}</td>
                 <td> {{ $datos->expediente }}</td>
                 <td> {{ $datos->consignatario }}</td>
                 <td> {{ $datos->renuncia }}</td>
@@ -31,8 +32,18 @@
                 <td> {{ $datos->tipo }}</td>
                 <td> {{ $datos->eta }}</td>
                 <td> {{ $datos->motonave }}</td>
-                <td> {{ $datos->linea }}</td>
-                 <td> {{ $datos->obs }}</td>
+                @if ($datos->linea > 0)
+                    <td> {{ $datos->tipolinea->nombre }}</td>
+                @else
+                    <td> </td>
+                @endif
+                @if ($datos->id_puerto > 0)
+                    <td> {{ $datos->tipopuerto->nombre }}</td>
+                @else
+                    <td> </td>
+                @endif
+
+                <td> {{ $datos->obs }}</td>
                 @if ($datos->envio > 0)
                     <td> {{ $datos->tipoenvio->nombre }}</td>
                 @else

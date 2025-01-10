@@ -54,12 +54,11 @@ class ExportTable extends DataTableComponent
 
         $this->setBulkActions([
             'export' => 'Exportar',
-            //'updatemasivo' => 'Actualizar',
             'exportcarpeta' => 'Plantilla carpeta',
         ]);
 
 
-        $this->setTrAttributes(function($row, $index) {
+        $this->setTrAttributes(function ($row, $index) {
             $date = Carbon::now();
 
             if ($row->updated_at->format('Y-m-d') == $date->format('Y-m-d')) {
@@ -97,9 +96,10 @@ class ExportTable extends DataTableComponent
             Column::make('cliente')->secondaryHeader($this->getFilterByKey('cliente'))
                 ->sortable(),
 
-            Column::make('linea')
+            Column::make('linea')->hideIf(true),
+            Column::make('linea','tipolinea.nombre')->sortable(),
 
-                ->sortable()->collapseAlways(),
+            Column::make('puerto', 'tipopuerto.nombre')->sortable(),
 
             Column::make('envio', 'tipoenvio.nombre')->secondaryHeader($this->getFilterByKey('envio'))
                 ->sortable(),
@@ -111,18 +111,22 @@ class ExportTable extends DataTableComponent
                     return $value == 1 ? 'Sí' : 'No';
                 }),
 
-
+            Column::make('Correo Enviado', 'send')->collapseAlways()->format(function ($value) {
+                return $value == 1 ? 'Sí' : 'No';
+            }),
 
             Column::make('obs')->secondaryHeader($this->getFilterByKey('obs'))->collapseAlways(),
 
             Column::make('renuncia')->collapseAlways(),
-            Column::make('ultima actualizacion','updated_at')->collapseAlways(),
+            Column::make('ultima actualizacion', 'updated_at')->collapseAlways(),
 
             Column::make('Actions')->label(
                 fn($row, Column $column) => view('livewire.estatus', [
                     'valor' => 'BOTON',
                     'id' => $row->id,
                     'liberar' => $row->liberacion,
+                    'sends' => $row->send,
+                    'lineas' => $row->linea,
                 ])
             ),
 
@@ -163,7 +167,7 @@ class ExportTable extends DataTableComponent
                     $builder->where('consignatario', 'like', '%' . $value . '%');
                 }),
 
-                  TextFilter::make('expediente')
+            TextFilter::make('expediente')
                 ->config([
                     'placeholder' => 'Buscar expediente',
                 ])
@@ -247,7 +251,7 @@ class ExportTable extends DataTableComponent
 
         $this->clearSelected();
         if (count($id) > 0) {
-            return Excel::download(new ExportInfo($id,'general'), 'datosexportacion.xlsx');
+            return Excel::download(new ExportInfo($id, 'general'), 'datosexportacion.xlsx');
         }
     }
 
@@ -262,26 +266,15 @@ class ExportTable extends DataTableComponent
         }
     }
 
-  /*  public function updatemasivo()
-    {
-        $id = $this->getSelected();
-
-        if (count($id) > 0) {
-            $this->dispatch('editarmasivamente', $id);
-        }
-    }*/
-
-
     #[On('datosActualizados')]
     public function builder(): Builder
     {
         $query = Exportacion::query()->where(function ($query) {
 
-                                $query->wherenotin('estatus',[3])
-                                ->ORwhere('estatus',null);
-
-                        })
-        ->orderby('eta', 'ASC')->orderby('motonave', 'ASC')
+            $query->wherenotin('estatus', [3])
+                ->ORwhere('estatus', null);
+        })
+            ->orderby('eta', 'ASC')->orderby('motonave', 'ASC')
             ->orderby('cliente', 'ASC')->orderby('consignatario', 'ASC');
 
         return $query;

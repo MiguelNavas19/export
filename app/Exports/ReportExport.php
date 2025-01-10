@@ -172,7 +172,13 @@ class ReportExport implements  WithStyles, ShouldAutoSize
 
         $sheet->getStyle('H18')->getFont()->setSize(12);
         $sheet->mergeCells('H18:H20');
-        $sheet->setCellValue('H18', $registro->linea);
+
+        if ($registro->linea > 0){
+            $sheet->setCellValue('H18', $registro->tipolinea->nombre);
+        }else{
+            $sheet->setCellValue('H18', $registro->linea);
+        }
+
         $sheet->getStyle('H18:H20')->getAlignment()->setHorizontal('center');
         $sheet->getStyle('H18:H20')->getAlignment()->setVertical('center');
 

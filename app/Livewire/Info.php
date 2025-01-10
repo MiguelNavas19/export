@@ -2,9 +2,12 @@
 
 namespace App\Livewire;
 
+use App\Jobs\SendMailJob;
 use App\Models\Bitacora;
 use App\Models\Estatus;
 use App\Models\exportacion;
+use App\Models\Naviera;
+use App\Models\Puertos;
 use App\Models\Tipo;
 use Livewire\Component;
 use Livewire\Attributes\On;
@@ -34,6 +37,7 @@ class Info extends Component
     public $obs = '';
     public $cliente = "";
     public $linea = '';
+    public $puerto = '';
     public $enviomodal;
     public $estatusmodal;
     public $liberacion;
@@ -44,7 +48,6 @@ class Info extends Component
     public $nuevocliente = false;
     public $motonavemas = '';
     public $etamas = '';
-
 
 
     public function rules()
@@ -69,20 +72,15 @@ class Info extends Component
     }
 
 
-
     #[On('editar')]
     public function editar($id)
     {
 
-        $this->reset(['renuncia', 'motonave', 'expediente', 'consignatario', 'bl', 'tipo', 'contenedor', 'eta', 'obs', 'cliente', 'linea', 'enviomodal', 'estatusmodal', 'liberacion']);
+        $this->reset(['renuncia', 'motonave', 'expediente', 'consignatario', 'bl', 'tipo', 'contenedor', 'eta', 'obs', 'cliente', 'linea', 'enviomodal', 'estatusmodal', 'liberacion', 'puerto']);
 
         $this->masivo = false;
         $this->nuevocliente = false;
         $this->opensave = true;
-        /*$query = exportacion::where(function ($query) {
-                                $query->where('estatus', '!=', 3)
-                                ->orWhere('estatus', null);
-                        })->where('id', $id)->first();*/
 
         $query = exportacion::where('id', $id)->first();
 
@@ -100,6 +98,7 @@ class Info extends Component
         $this->enviomodal = $query->envio;
         $this->estatusmodal = $query->estatus;
         $this->renuncia = $query->renuncia;
+        $this->puerto = $query->id_puerto;
         $this->idex = $id;
     }
 
@@ -111,7 +110,7 @@ class Info extends Component
         DB::beginTransaction();
         try {
 
-            if(empty($this->eta) OR is_null($this->eta)){
+            if (empty($this->eta) or is_null($this->eta)) {
                 $this->eta = null;
             }
             $antes =  exportacion::where('id', $this->idex)->first();
@@ -131,6 +130,7 @@ class Info extends Component
                 'estatus' => $this->estatusmodal,
                 'liberacion' => $this->liberacion,
                 'renuncia' => $this->renuncia,
+                'id_puerto' => $this->puerto,
             ]);
 
 
@@ -154,62 +154,21 @@ class Info extends Component
 
 
 
-    /*  #[On('editarmasivamente')]
-    public function editarmasivamente($id)
-    {
-
-        $this->nuevocliente = false;
-        $this->opensave = true;
-        $this->masivo = true;
-        $query = exportacion::where('estatus', '!=', 3)->wherein('id', $id)->first();
-        $this->motonavemas = $query->motonave;
-        $this->etamas = $query->eta;
-
-        $this->idex = $id;
-    }*/
-
-
-    /* public function actualizardatosmasivos()
-    {
-        //$this->validate();
-        DB::beginTransaction();
-        try {
-
-            exportacion::wherein('id', $this->idex)->update([
-                'motonave' =>  $this->motonavemas,
-                'eta' => $this->etamas,
-            ]);
-
-
-            $this->opensave = false;
-
-            DB::commit();
-
-            //$this->dispatch('datosActualizados');
-
-        } catch (Exception $e) {
-            DB::rollBack();
-            // $this->dispatch('alert', 'error',  'Error', $e->getMessage());
-        }
-    }
-*/
-
-
-
     #[On('nuevocliente')]
     public function nuevocliente()
     {
 
-        $this->reset(['renuncia','motonave', 'expediente', 'consignatario', 'bl', 'tipo', 'contenedor', 'eta', 'obs', 'cliente', 'linea', 'enviomodal', 'estatusmodal', 'liberacion']);
+        $this->reset(['renuncia', 'motonave', 'expediente', 'consignatario', 'bl', 'tipo', 'contenedor', 'eta', 'obs', 'cliente', 'linea', 'enviomodal', 'estatusmodal', 'liberacion', 'puerto']);
         $this->nuevocliente = true;
         $this->masivo = false;
         $this->opensave = true;
     }
 
 
-
+    #[On('ingresarnuevos')]
     public function ingresarnuevo()
     {
+
         $this->validate();
         DB::beginTransaction();
         try {
@@ -260,35 +219,28 @@ class Info extends Component
                     'estatus' => $this->estatusmodal,
                     'liberacion' => $this->liberacion,
                     'renuncia' => $this->renuncia,
-                ]);
-
-                $databitacora = json_encode([
-                    'motonave' =>  $this->motonave,
-                    'expediente' => $this->expediente,
-                    'consignatario' => $this->consignatario,
-                    'bl' => $this->bl,
-                    'tipo' => $this->tipo,
-                    'contenedor' => $this->contenedor,
-                    'eta' => $fecha,
-                    'obs' => $this->obs,
-                    'cliente' => $this->cliente,
-                    'linea' => $this->linea,
-                    'envio' => $this->enviomodal,
-                    'estatus' => $this->estatusmodal,
-                    'liberacion' => $this->liberacion,
-                    'renuncia' => $this->renuncia,
+                    'id_puerto' => $this->puerto,
                 ]);
 
                 Bitacora::Create([
                     'id_usuario' =>  Auth::user()->id,
                     'antes' => 'nuevo registro',
-                    'despues' => $databitacora
+                    'despues' => $exp
                 ]);
 
                 $this->opensave = false;
+
                 DB::commit();
 
                 $this->dispatch('alertamensaje', 'success',  'Exito', 'Cliente registrado');
+
+                if ($exp->tipolinea->datosnaviera->count() > 0){
+
+                    $emails = collect($exp->tipolinea->datosnaviera)->pluck('email')->toArray();
+                    SendMailJob::dispatch($emails, $this->bl);
+                    $exp->update(['send' => true]);
+                }
+
             } else {
                 $this->dispatch('alertamensaje', 'error',  'Error', 'BL o Expediente ya registrados');
                 DB::rollBack();
@@ -342,6 +294,27 @@ class Info extends Component
         $this->idex = $id;
     }
 
+    #[On('enviarmail')]
+    public function enviarmail($id)
+    {
+        $data = exportacion::where('id', $id)->where('send', false)->first();
+        if ($data) {
+            if ($data->tipolinea->datosnaviera->count() > 0) {
+
+                $emails = collect($data->tipolinea->datosnaviera)->pluck('email')->toArray();
+
+                $this->dispatch('alertamensaje', 'success',  'Exito', 'Correo enviado con exito');
+
+                SendMailJob::dispatch($emails, $data->bl);
+                $data->update(['send' => true]);
+            } else {
+                $this->dispatch('alertamensaje', 'error',  'Error', 'Naviera ' . $data->tipolinea->nombre . ' no tiene correo registrado');
+            }
+        } else {
+            $this->dispatch('alertamensaje', 'error',  'Error', 'Correo ya fue enviado');
+        }
+    }
+
 
     public function generarpdf()
     {
@@ -357,20 +330,16 @@ class Info extends Component
             $exportacion = exportacion::where('id', $this->idex)->first();
             $dirigido = $this->dirigido;
 
-           $pdf = Pdf::loadView('pdf.carta', compact('exportacion','dirigido'))->setPaper('a4');
+            $pdf = Pdf::loadView('pdf.carta', compact('exportacion', 'dirigido'))->setPaper('a4');
 
             return response()->streamDownload(function () use ($pdf) {
                 // Aquí simplemente se debe llamar a la función que genera el PDF.
-               echo $pdf->stream(); // o cualquier método que use para obtener el contenido del PDF
-            }, 'carta_bl_'.$dirigido.'.pdf');
-
-
-
+                echo $pdf->stream(); // o cualquier método que use para obtener el contenido del PDF
+            }, 'carta_bl_' . $dirigido . '.pdf');
         } catch (Exception $e) {
 
             $this->dispatch('errormensaje', 'error',  'Error', $e->getMessage());
         }
-
     }
 
     public function render()
@@ -378,8 +347,9 @@ class Info extends Component
 
         $qenvio = Tipo::get();
         $qestatus = Estatus::get();
+        $qpuertos = Puertos::where('status', true)->get();
+        $naviera = Naviera::where('status', true)->get();
 
-
-        return view('livewire.info', compact('qenvio', 'qestatus'));
+        return view('livewire.info', compact('qenvio', 'qestatus', 'qpuertos', 'naviera'));
     }
 }

@@ -3,14 +3,11 @@
 namespace App\Exports;
 
 use App\Models\exportacion;
-use Illuminate\Container\Attributes\Storage;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
-
-
 
 class ReportExport implements  WithStyles, ShouldAutoSize
 {

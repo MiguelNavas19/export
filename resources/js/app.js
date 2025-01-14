@@ -155,3 +155,9 @@ window.enviarmail = function (id) {
     const event = new CustomEvent("enviarmail", { detail: { id: id } });
     window.dispatchEvent(event);
 };
+
+
+window.apendi = function (id) {
+    const event = new CustomEvent("apendi", { detail: { id: id } });
+    window.dispatchEvent(event);
+};

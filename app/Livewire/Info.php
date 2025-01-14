@@ -43,11 +43,13 @@ class Info extends Component
     public $liberacion;
     public $idex;
     public $dirigido = '';
-
+    public $direccion = '';
     public $masivo = false;
     public $nuevocliente = false;
     public $motonavemas = '';
     public $etamas = '';
+    public $titulo = ' Carta BL';
+    public $apendi = false;
 
 
     public function rules()
@@ -116,20 +118,20 @@ class Info extends Component
             $antes =  exportacion::where('id', $this->idex)->first();
 
             exportacion::where('id', $this->idex)->update([
-                'motonave' =>  $this->motonave,
-                'expediente' => $this->expediente,
-                'consignatario' => $this->consignatario,
-                'bl' => $this->bl,
-                'tipo' => $this->tipo,
-                'contenedor' => $this->contenedor,
+                'motonave' =>  trim($this->motonave),
+                'expediente' => trim($this->expediente),
+                'consignatario' => trim($this->consignatario),
+                'bl' => trim($this->bl),
+                'tipo' => trim($this->tipo),
+                'contenedor' => trim($this->contenedor),
                 'eta' => $this->eta,
-                'obs' => $this->obs,
-                'cliente' => $this->cliente,
+                'obs' => trim($this->obs),
+                'cliente' => trim($this->cliente),
                 'linea' => $this->linea,
                 'envio' => $this->enviomodal,
                 'estatus' => $this->estatusmodal,
                 'liberacion' => $this->liberacion,
-                'renuncia' => $this->renuncia,
+                'renuncia' => trim($this->renuncia),
                 'id_puerto' => $this->puerto,
             ]);
 
@@ -169,10 +171,10 @@ class Info extends Component
     public function ingresarnuevo()
     {
 
-        $this->validate();
         DB::beginTransaction();
         try {
 
+            $this->validate();
             $fecha = $this->eta;
             if (isset($fecha) && $fecha !== '') {
                 // Verificar si $fecha es una instancia de Carbon
@@ -194,31 +196,31 @@ class Info extends Component
             }
 
             $consulta = exportacion::where(function ($query) {
-                if (isset($this->expediente) && $this->expediente !== '') {
-                    $query->where('bl', $this->bl)
-                        ->orWhere('expediente', $this->expediente);
+                if (isset($this->expediente) && trim($this->expediente) !== '') {
+                    $query->where('bl', trim($this->bl))
+                        ->orWhere('expediente', trim($this->expediente));
                 } else {
-                    $query->where('bl', $this->bl);
+                    $query->where('bl', trim($this->bl));
                 }
             })
                 ->get();
 
             if (count($consulta) == 0) {
                 $exp =  exportacion::Create([
-                    'motonave' =>  $this->motonave,
-                    'expediente' => $this->expediente,
-                    'consignatario' => $this->consignatario,
-                    'bl' => $this->bl,
-                    'tipo' => $this->tipo,
-                    'contenedor' => $this->contenedor,
+                    'motonave' =>  trim($this->motonave),
+                    'expediente' => trim($this->expediente),
+                    'consignatario' => trim($this->consignatario),
+                    'bl' => trim($this->bl),
+                    'tipo' => trim($this->tipo),
+                    'contenedor' => trim($this->contenedor),
                     'eta' => $fecha,
-                    'obs' => $this->obs,
-                    'cliente' => $this->cliente,
+                    'obs' => trim($this->obs),
+                    'cliente' => trim($this->cliente),
                     'linea' => $this->linea,
                     'envio' => $this->enviomodal,
                     'estatus' => $this->estatusmodal,
                     'liberacion' => $this->liberacion,
-                    'renuncia' => $this->renuncia,
+                    'renuncia' => trim($this->renuncia),
                     'id_puerto' => $this->puerto,
                 ]);
 
@@ -234,13 +236,12 @@ class Info extends Component
 
                 $this->dispatch('alertamensaje', 'success',  'Exito', 'Cliente registrado');
 
-                if ($exp->tipolinea->datosnaviera->count() > 0){
+                if ($exp->tipolinea->datosnaviera->count() > 0) {
 
                     $emails = collect($exp->tipolinea->datosnaviera)->pluck('email')->toArray();
                     SendMailJob::dispatch($emails, $this->bl);
                     $exp->update(['send' => true]);
                 }
-
             } else {
                 $this->dispatch('alertamensaje', 'error',  'Error', 'BL o Expediente ya registrados');
                 DB::rollBack();
@@ -284,15 +285,33 @@ class Info extends Component
     public function pdfbl($id)
     {
 
-        $this->reset(['renuncia', 'motonave', 'expediente', 'consignatario', 'bl', 'tipo', 'contenedor', 'eta', 'obs', 'cliente', 'linea', 'enviomodal', 'estatusmodal', 'liberacion']);
+        $this->reset(['direccion', 'dirigido', 'renuncia', 'motonave', 'expediente', 'consignatario', 'bl', 'tipo', 'contenedor', 'eta', 'obs', 'cliente', 'linea', 'enviomodal', 'estatusmodal', 'liberacion', 'puerto']);
 
         $this->masivo = false;
         $this->nuevocliente = false;
         $this->opensave = false;
         $this->openpdf = true;
-
+        $this->apendi = false;
+        $this->titulo = 'Carta BL';
         $this->idex = $id;
     }
+
+
+    #[On('apendi')]
+    public function apendi($id)
+    {
+
+        $this->reset(['direccion', 'dirigido', 'renuncia', 'motonave', 'expediente', 'consignatario', 'bl', 'tipo', 'contenedor', 'eta', 'obs', 'cliente', 'linea', 'enviomodal', 'estatusmodal', 'liberacion', 'puerto']);
+
+        $this->masivo = false;
+        $this->nuevocliente = false;
+        $this->opensave = false;
+        $this->openpdf = true;
+        $this->apendi = true;
+        $this->titulo = 'Apendi A,B';
+        $this->idex = $id;
+    }
+
 
     #[On('enviarmail')]
     public function enviarmail($id)
@@ -320,22 +339,38 @@ class Info extends Component
     {
         $this->skipRender();
         try {
-            if (empty(trim($this->dirigido))) {
-                throw new InvalidArgumentException('El campo dirigido no puede estar vacío');
-            }
 
-            if (!is_string(trim($this->dirigido))) {
-                throw new TypeError('El campo dirigido debe ser una cadena');
-            }
             $exportacion = exportacion::where('id', $this->idex)->first();
-            $dirigido = $this->dirigido;
 
-            $pdf = Pdf::loadView('pdf.carta', compact('exportacion', 'dirigido'))->setPaper('a4');
+            if ($this->apendi) {
+                if (empty(trim($this->direccion))) {
+                    throw new InvalidArgumentException('El campo direccion no puede estar vacío');
+                }
+                $direccion = $this->direccion;
+                $pdf = Pdf::loadView('pdf.apendi', compact('exportacion', 'direccion'))->setPaper('a4');
 
-            return response()->streamDownload(function () use ($pdf) {
-                // Aquí simplemente se debe llamar a la función que genera el PDF.
-                echo $pdf->stream(); // o cualquier método que use para obtener el contenido del PDF
-            }, 'carta_bl_' . $dirigido . '.pdf');
+                return response()->streamDownload(function () use ($pdf) {
+                    // Aquí simplemente se debe llamar a la función que genera el PDF.
+                    echo $pdf->stream(); // o cualquier método que use para obtener el contenido del PDF
+                }, 'APENDI.pdf');
+            } else {
+
+                if (empty(trim($this->dirigido))) {
+                    throw new InvalidArgumentException('El campo dirigido no puede estar vacío');
+                }
+
+                if (!is_string(trim($this->dirigido))) {
+                    throw new TypeError('El campo dirigido debe ser una cadena');
+                }
+                $dirigido = $this->dirigido;
+
+                $pdf = Pdf::loadView('pdf.carta', compact('exportacion', 'dirigido'))->setPaper('a4');
+
+                return response()->streamDownload(function () use ($pdf) {
+                    // Aquí simplemente se debe llamar a la función que genera el PDF.
+                    echo $pdf->stream(); // o cualquier método que use para obtener el contenido del PDF
+                }, 'carta_bl_' . $dirigido . '.pdf');
+            }
         } catch (Exception $e) {
 
             $this->dispatch('errormensaje', 'error',  'Error', $e->getMessage());

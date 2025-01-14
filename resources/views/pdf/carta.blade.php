@@ -1,25 +1,24 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>Carta BL {{ $dirigido }}</title>
+    <style>
+        .cuerpo {
+        margin: 2rem 3.5rem; /* 2.5 unidades para arriba y abajo, 3 unidades para los lados */
+        font-family: 'Calibri', sans-serif; /* Calibri como fuente principal y sans-serif como fuente secundaria */
+        font-size: 15px; /* Tamaño de letra de 16 píxeles */
+
+    }
+    .indentado {
+                text-indent: 30px; /* Cambia el valor según la cantidad de sangría que desees */
+            }
+    p{
+        line-height: 1.5;
+    }
+    </style>
 </head>
-<style>
-    .cuerpo {
-    margin: 2rem 3.5rem; /* 2.5 unidades para arriba y abajo, 3 unidades para los lados */
-    font-family: 'Calibri', sans-serif; /* Calibri como fuente principal y sans-serif como fuente secundaria */
-    font-size: 15px; /* Tamaño de letra de 16 píxeles */
-
-}
-.indentado {
-            text-indent: 30px; /* Cambia el valor según la cantidad de sangría que desees */
-        }
-p{
-    line-height: 1.5;
-}
-</style>
-
 <body class="cuerpo">
     <div align='center'>
         <img width="100%" height="15%" src="{{ public_path() . '/storage/img/cabecera.png' }}">
@@ -28,8 +27,6 @@ p{
     <br><br>
 
     <div>
-        <p align='right'>Maiquetía, 18 de Octubre del 2024</p>
-        <br>
         <p align='left'>Señores: {{ $dirigido }}</p>
         <p align='left'><b>{{ $exportacion->motonave }}</b></p>
         <p align='left'><b>{{ $exportacion->expediente }}</b></p>

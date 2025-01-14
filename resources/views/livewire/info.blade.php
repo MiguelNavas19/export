@@ -39,11 +39,21 @@
 
             <x-dialog-modal maxWidth='2xl' wire:model='openpdf'>
                 <x-slot name="title">
-                    Carta BL
+                   {{ $titulo }}
                 </x-slot>
                 <x-slot name="content">
                     <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4">
-
+                        @if($apendi)
+                        <div>
+                            <x-label>Dirección</x-label>
+                            <x-input  wire:model='direccion'
+                                class="block w-full rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
+                            </x-input>
+                            <div>
+                                @error('direccion') <span class="error">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+                        @else
                         <div>
                             <x-label>Dirigido</x-label>
                             <x-input  wire:model='dirigido'
@@ -53,6 +63,7 @@
                                 @error('dirigido') <span class="error">{{ $message }}</span> @enderror
                             </div>
                         </div>
+                        @endif
 
                     </div>
 

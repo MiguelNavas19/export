@@ -13,6 +13,8 @@ use Rappasoft\LaravelLivewireTables\Views\Filters\DateRangeFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\TextFilter;
 use Maatwebsite\Excel\Facades\Excel;
 use Livewire\Attributes\On;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Exception;
 
 class ExportTable extends DataTableComponent
 {
@@ -23,7 +25,7 @@ class ExportTable extends DataTableComponent
         $this->setSearchDisabled();
         $this->setFiltersVisibilityStatus(false);
         $this->setPerPageVisibilityStatus(false);
-        $this->setPerPageAccepted([30]);
+        $this->setPerPageAccepted([100]);
         $this->setLoadingPlaceholderStatus(true);
         $this->setLoadingPlaceholderContent('Cargando...');
         $this->setTdAttributes(function (Column $column, $row, $columnIndex, $rowIndex) {
@@ -55,6 +57,7 @@ class ExportTable extends DataTableComponent
         $this->setBulkActions([
             'export' => 'Exportar',
             'exportcarpeta' => 'Plantilla carpeta',
+            'exportestatus' => 'Exportar Estatus',
         ]);
 
 
@@ -97,7 +100,7 @@ class ExportTable extends DataTableComponent
                 ->sortable(),
 
             Column::make('linea')->hideIf(true),
-            Column::make('linea','tipolinea.nombre')->sortable(),
+            Column::make('linea', 'tipolinea.nombre')->sortable(),
 
             Column::make('puerto', 'tipopuerto.nombre')->sortable(),
 
@@ -254,6 +257,35 @@ class ExportTable extends DataTableComponent
             return Excel::download(new ExportInfo($id, 'general'), 'datosexportacion.xlsx');
         }
     }
+
+
+    public function exportestatus()
+    {
+
+        $this->skipRender();
+        try {
+
+            $id = $this->getSelected();
+
+            $this->clearSelected();
+            if (count($id) > 0) {
+              $data = exportacion::whereIn('id', $id)->orderby('eta', 'ASC')->orderby('cliente', 'ASC')->orderby('motonave', 'ASC')->orderby('consignatario', 'ASC')->get();
+
+              $pdf = Pdf::loadView('pdf.pdfestatus', compact('data'))->setPaper('a4', 'landscape');
+
+                return response()->streamDownload(function () use ($pdf) {
+                    // Aquí simplemente se debe llamar a la función que genera el PDF.
+                    echo $pdf->stream(); // o cualquier método que use para obtener el contenido del PDF
+                }, 'exportacionestatus.pdf');
+            }
+
+        } catch (Exception $e) {
+
+            $this->dispatch('errormensaje', 'error',  'Error', $e->getMessage());
+        }
+    }
+
+
 
 
     public function exportcarpeta()

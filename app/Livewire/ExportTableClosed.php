@@ -23,7 +23,7 @@ class ExportTableClosed extends DataTableComponent
         $this->setSearchDisabled();
         $this->setFiltersVisibilityStatus(false);
         $this->setPerPageVisibilityStatus(false);
-        $this->setPerPageAccepted([30]);
+        $this->setPerPageAccepted([100]);
         $this->setLoadingPlaceholderStatus(true);
         $this->setLoadingPlaceholderContent('Cargando...');
         $this->setTdAttributes(function (Column $column, $row, $columnIndex, $rowIndex) {

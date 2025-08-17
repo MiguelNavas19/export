@@ -119,7 +119,13 @@ class ExportTableClosed extends DataTableComponent
 
             Column::make('renuncia')->collapseAlways(),
             Column::make('ultima actualizacion', 'updated_at')->collapseAlways(),
-
+              Column::make('Fecha de Creacion', 'created_at')->collapseAlways(),
+            Column::make('Fecha de pago','fecha_pago')
+            ->sortable(),
+            Column::make('Fecha de entrega','fecha_entrega')
+            ->sortable(),
+            Column::make('Fecha veconinter','fecha_veconinter')
+            ->sortable(),
             Column::make('Actions')->label(
                 fn($row, Column $column) => view('livewire.estatus', [
                     'valor' => 'BOTON',

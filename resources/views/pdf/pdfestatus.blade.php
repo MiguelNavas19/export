@@ -18,23 +18,39 @@
 
         }
 
-      table {
-          font-size: 8px;
-        width: 100%; /* La tabla ocupará el 100% del ancho del contenedor */
-        max-width: 100%; /* No excederá el ancho del contenedor */
-        border-collapse: collapse; /* Para que los bordes se vean bien */
-        table-layout: auto; /* Permite que las columnas se ajusten al contenido */
+    table {
+        font-size: 10px; /* Tamaño un poco más grande para mejor legibilidad */
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: auto;
+        word-wrap: break-word;
     }
+    
     th, td {
-        padding: 8px; /* Espaciado interno */
-        border: 1px solid black; /* Borde de las celdas */
-        text-align: center; /* Centrar el texto */
-        overflow: hidden; /* Oculta el desbordamiento */
-        white-space: nowrap; /* Evita que el texto se divida en varias líneas */
-        text-overflow: ellipsis; /* Agrega '...' si el texto es demasiado largo */
+        padding: 4px;
+        border: 1px solid black;
+        text-align: center;
+        white-space: normal; /* Permite saltos de línea */
+        word-break: break-word; /* Rompe palabras largas */
+        max-width: 120px; /* Ancho máximo para forzar ajuste */
+        vertical-align: top; /* Alinea el contenido en la parte superior */
     }
+    
     thead {
-        background: rgb(154, 224, 154); /* Color de fondo para el encabezado */
+        background: rgb(154, 224, 154);
+    }
+    
+    /* Ajustes específicos para columnas críticas */
+    td:nth-child(1), th:nth-child(1) { /* CLIENTE */
+        max-width: 100px;
+    }
+    
+    td:nth-child(3), th:nth-child(3) { /* CONSIGNATARIO */
+        max-width: 150px;
+    }
+    
+    td:nth-child(9), th:nth-child(9) { /* MOTONAVE */
+        max-width: 130px;
     }
     </style>
 </head>

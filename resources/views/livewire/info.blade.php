@@ -221,6 +221,13 @@
                                 <option value="true">Si</option>
                             </select>
                         </div>
+                        
+                        <div>
+                            <x-label>Fecha veconinter</x-label>
+                            <x-input wire:model='fechaveconinter' type='date'
+                                class="block w-full rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
+                            </x-input>
+                        </div>
 
 
                     </div>
@@ -362,7 +369,27 @@
                                 <option value="true">Si</option>
                             </select>
                         </div>
+                        
+                                 <div>
+                            <x-label>Fecha de pago</x-label>
+                            <x-input wire:model='fechapago' type='date'
+                                class="block w-full rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
+                            </x-input>
+                        </div>
 
+                        <div>
+                            <x-label>Fecha de entrega</x-label>
+                            <x-input wire:model='fechaentrega' type='date'
+                                class="block w-full rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
+                            </x-input>
+                        </div>
+    
+                            <div>
+                            <x-label>Fecha veconinter</x-label>
+                            <x-input wire:model='fechaveconinter' type='date'
+                                class="block w-full rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
+                            </x-input>
+                        </div>
 
                     </div>
 

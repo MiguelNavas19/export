@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('navieras', function (Blueprint $table) {
             $table->id(); // id primary key autoincrementable
             $table->text('nombre')->unique(); // nombre, debe ser único
-            $table->boolean('estatus')->default(true); // estatus, por defecto true
+            $table->boolean('status')->default(true); // estatus, por defecto true
             $table->timestamps();
         });
     }

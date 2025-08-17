@@ -15,7 +15,7 @@
                     <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                         {{ __('Inicio') }}
                     </x-nav-link>
-                    @if (in_array(Auth::user()->id, [1, 2, 3]))
+                    @if (in_array(Auth::user()->id, [1, 2, 3, 4, 6]))
                         <x-nav-link href="{{ route('cerrados') }}" :active="request()->routeIs('cerrados')">
                             {{ __('Cerrados') }}
                         </x-nav-link>
@@ -159,7 +159,7 @@
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
 
-            @if (in_array(Auth::user()->id, [1, 2, 3]))
+            @if (in_array(Auth::user()->id, [1, 2, 3 , 4]))
                 <x-responsive-nav-link href="{{ route('cerrados') }}" :active="request()->routeIs('cerrados')">
 
 

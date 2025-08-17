@@ -44,6 +44,7 @@
                                     >
                                         Iniciar
                                     </a>
+                                    
 
                                     @if (Route::has('register'))
                                         <a

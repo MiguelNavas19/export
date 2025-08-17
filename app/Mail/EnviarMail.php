@@ -23,12 +23,21 @@ class EnviarMail extends Mailable
     public function envelope(): Envelope
     {
 
+      // Definir las direcciones de correo electrónico en variables para mayor claridad
+        $fromAddress = new Address('operaciones@exportar.salvadordelaplaza.com', 'Machado & Guedez');
+        $ccAddresses = [
+            new Address('operaciones@machadoyguedez.com', 'Operaciones')
+        ];
+        
+        // Crear el asunto del correo
+        $subject = sprintf('Solicitud de estatus de liberación y días libres del BL %s', $this->bl);
+        // Retornar un nuevo Envelope
         return new Envelope(
-            from: new Address('operaciones@machadoyguedez.com', 'Machado & Guedez'),
-            subject: 'Solicitud de estatus de liberación y dias libres del BL '.$this->bl,
+            from: $fromAddress,
+            subject: $subject,
+            cc: $ccAddresses
         );
     }
-
 
     public function content(): Content
     {

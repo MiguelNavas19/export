@@ -1,0 +1,1 @@
+[09-Jul-2025 11:57:03 America/Caracas] PHP Fatal error:  Allowed memory size of 536870912 bytes exhausted (tried to allocate 20480 bytes) in /home/salvador/public_html/exportar.salvadordelaplaza.com/vendor/dompdf/dompdf/src/Css/Style.php on line 2282

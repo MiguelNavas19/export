@@ -19,6 +19,8 @@ use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use InvalidArgumentException;
 use TypeError;
+use PhpOffice\PhpWord\TemplateProcessor;
+use Illuminate\Support\Facades\Response;
 
 
 class Info extends Component
@@ -50,7 +52,12 @@ class Info extends Component
     public $etamas = '';
     public $titulo = ' Carta BL';
     public $apendi = false;
-
+    public $retiro;
+    public $word = false;
+    public $fechapago = '';
+    public $fechaentrega = '';
+    public $namearchive;
+    public $fechaveconinter = '';
 
     public function rules()
     {
@@ -78,7 +85,7 @@ class Info extends Component
     public function editar($id)
     {
 
-        $this->reset(['renuncia', 'motonave', 'expediente', 'consignatario', 'bl', 'tipo', 'contenedor', 'eta', 'obs', 'cliente', 'linea', 'enviomodal', 'estatusmodal', 'liberacion', 'puerto']);
+        $this->reset(['fechaentrega','fechapago','renuncia', 'motonave', 'expediente', 'consignatario', 'bl', 'tipo', 'contenedor', 'eta', 'obs', 'cliente', 'linea', 'enviomodal', 'estatusmodal', 'liberacion', 'puerto']);
 
         $this->masivo = false;
         $this->nuevocliente = false;
@@ -102,6 +109,9 @@ class Info extends Component
         $this->renuncia = $query->renuncia;
         $this->puerto = $query->id_puerto;
         $this->idex = $id;
+        $this->fechaentrega = $query->fecha_entrega;
+        $this->fechapago = $query->fecha_pago;
+        $this->fechaveconinter = $query->fecha_veconinter;
     }
 
 
@@ -115,6 +125,19 @@ class Info extends Component
             if (empty($this->eta) or is_null($this->eta)) {
                 $this->eta = null;
             }
+            
+            if (empty($this->fechaentrega) or is_null($this->fechaentrega)) {
+                $this->fechaentrega = null;
+            }
+
+            if (empty($this->fechapago) or is_null($this->fechapago)) {
+                $this->fechapago = null;
+            }
+            
+             if (empty($this->fechaveconinter) or is_null($this->fechaveconinter)) {
+                $this->fechaveconinter = null;
+            }
+            
             $antes =  exportacion::where('id', $this->idex)->first();
 
             exportacion::where('id', $this->idex)->update([
@@ -133,6 +156,9 @@ class Info extends Component
                 'liberacion' => $this->liberacion,
                 'renuncia' => trim($this->renuncia),
                 'id_puerto' => $this->puerto,
+                'fecha_entrega' => $this->fechaentrega,
+                'fecha_pago' => $this->fechapago,
+                'fecha_veconinter' => $this->fechaveconinter
             ]);
 
 
@@ -176,6 +202,7 @@ class Info extends Component
 
             $this->validate();
             $fecha = $this->eta;
+            $fechaveconinter = $this->fechaveconinter;
             if (isset($fecha) && $fecha !== '') {
                 // Verificar si $fecha es una instancia de Carbon
                 if (!$fecha instanceof Carbon) {
@@ -193,6 +220,25 @@ class Info extends Component
                 }
             } else {
                 $fecha = null;
+            }
+            
+              if (isset($fechaveconinter) && $fechaveconinter !== '') {
+                // Verificar si $fecha es una instancia de Carbon
+                if (!$fechaveconinter instanceof Carbon) {
+                    // Convertir a Carbon si no lo es
+                    $fechaveconinter = Carbon::parse($fechaveconinter);
+                }
+
+                // Formatear la fecha a 'Y-m-d'
+                $fechaveconinter = $fechaveconinter->format('Y-m-d');
+
+                // Verificar si el valor en $rows[5] es numérico y convertirlo a fecha
+                if (is_numeric($this->fechaveconinter)) {
+                    $fechaveconinter = Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($this->fechaveconinter));
+                    $fechaveconinter = $fechaveconinter->format('Y-m-d');
+                }
+            } else {
+                $fechaveconinter = null;
             }
 
             $consulta = exportacion::where(function ($query) {
@@ -222,6 +268,7 @@ class Info extends Component
                     'liberacion' => $this->liberacion,
                     'renuncia' => trim($this->renuncia),
                     'id_puerto' => $this->puerto,
+                    'fecha_veconinter' => $fechaveconinter,
                 ]);
 
                 Bitacora::Create([
@@ -282,7 +329,7 @@ class Info extends Component
 
 
     #[On('pdfbl')]
-    public function pdfbl($id)
+    public function pdfbl($id, $datos)
     {
 
         $this->reset(['direccion', 'dirigido', 'renuncia', 'motonave', 'expediente', 'consignatario', 'bl', 'tipo', 'contenedor', 'eta', 'obs', 'cliente', 'linea', 'enviomodal', 'estatusmodal', 'liberacion', 'puerto']);
@@ -292,7 +339,29 @@ class Info extends Component
         $this->opensave = false;
         $this->openpdf = true;
         $this->apendi = false;
-        $this->titulo = 'Carta BL';
+      
+        $this->titulo = match ($datos) {
+            3 => 'Renuncia',
+            2 => 'Retiro BL',
+            default => 'Carta BL',
+        };
+
+        $this->namearchive = match ($datos) {
+            3 => 'renuncia_',
+            2 => 'retiro_bl_',
+            default => 'carta_bl_',
+        };
+
+        $this->retiro = match ($datos) {
+            2 => 'pdf.retiro',
+            default => 'pdf.carta',
+        };
+
+        $this->word = match ($datos) {
+            3 => true,
+            default => false,
+        };
+      
         $this->idex = $id;
     }
 
@@ -316,15 +385,15 @@ class Info extends Component
     #[On('enviarmail')]
     public function enviarmail($id)
     {
-        $data = exportacion::where('id', $id)->where('send', false)->first();
+       $data = exportacion::where('id', $id)->first();
         if ($data) {
             if ($data->tipolinea->datosnaviera->count() > 0) {
 
                 $emails = collect($data->tipolinea->datosnaviera)->pluck('email')->toArray();
-
-                $this->dispatch('alertamensaje', 'success',  'Exito', 'Correo enviado con exito');
+               
 
                 SendMailJob::dispatch($emails, $data->bl);
+                 $this->dispatch('alertamensaje', 'success',  'Exito', 'Correo enviado con exito');
                 $data->update(['send' => true]);
             } else {
                 $this->dispatch('alertamensaje', 'error',  'Error', 'Naviera ' . $data->tipolinea->nombre . ' no tiene correo registrado');
@@ -335,7 +404,7 @@ class Info extends Component
     }
 
 
-    public function generarpdf()
+   public function generarpdf()
     {
         $this->skipRender();
         try {
@@ -364,12 +433,37 @@ class Info extends Component
                 }
                 $dirigido = $this->dirigido;
 
-                $pdf = Pdf::loadView('pdf.carta', compact('exportacion', 'dirigido'))->setPaper('a4');
+          if ($this->word) {
 
-                return response()->streamDownload(function () use ($pdf) {
-                    // Aquí simplemente se debe llamar a la función que genera el PDF.
-                    echo $pdf->stream(); // o cualquier método que use para obtener el contenido del PDF
-                }, 'carta_bl_' . $dirigido . '.pdf');
+                    // Ruta de la plantilla
+                    $templatePath = storage_path('app/public/plantillas/plantilla_carta.docx');
+                    $template = new TemplateProcessor($templatePath);
+
+                    // Reemplazar marcadores de texto
+                    $template->setValue('fecha', now()->day . ' de ' . strtoupper(now()->locale('es')->monthName) . ' de ' . now()->year);
+                    $template->setValue('dirigido', $dirigido);
+                    $template->setValue('bl', $exportacion->bl);
+                    $template->setValue('motonave', $exportacion->motonave);
+                    $template->setValue('renuncia', $exportacion->renuncia);
+                    $template->setValue('eta', \Carbon\Carbon::parse($exportacion->eta)->format('d/m/Y'));
+                    // Guardar el documento temporal
+                    $tempFile = storage_path('app/documento_generado.docx');
+                    $template->saveAs($tempFile);
+
+                    // Descargar el archivo
+                    return Response::download($tempFile, $this->namearchive . $dirigido .'.docx')
+                        ->deleteFileAfterSend(true);
+                } else {
+                    $view = $this->retiro;
+
+                    $fileName = $this->namearchive . $dirigido . '.pdf';
+
+                    $pdf = Pdf::loadView($view, compact('exportacion', 'dirigido'))->setPaper('a4');
+
+                    return response()->streamDownload(function () use ($pdf) {
+                        echo $pdf->stream(); // o cualquier método que use para obtener el contenido del PDF
+                    }, $fileName);
+                }
             }
         } catch (Exception $e) {
 
@@ -381,7 +475,11 @@ class Info extends Component
     {
 
         $qenvio = Tipo::get();
-        $qestatus = Estatus::get();
+
+        $qestatus = Auth::user()->id == 5
+        ? Estatus::whereNotIn('id', [3])->get()
+        : Estatus::get();
+
         $qpuertos = Puertos::where('status', true)->get();
         $naviera = Naviera::where('status', true)->get();
 

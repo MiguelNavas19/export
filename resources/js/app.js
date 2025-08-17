@@ -98,7 +98,7 @@ window.dateRange = function () {
 
 window.eliminar = function (id) {
     Swal.fire({
-        title: "Â¿Seguro?",
+        title: "¢ÄSeguro?",
         text: "Desea eliminar este registro?",
         icon: "warning",
         showCancelButton: true,
@@ -113,10 +113,10 @@ window.eliminar = function (id) {
     });
 };
 
-window.pdfbl = function (id) {
-    const event = new CustomEvent("pdfbl", { detail: { id: id } });
-    window.dispatchEvent(event);
-};
+window.pdfbl = (id, datos) =>
+    window.dispatchEvent(
+      new CustomEvent('pdfbl', { detail: { id, datos } })
+    );
 
 Livewire.on("errormensaje", function (icono) {
     Swal.fire({

@@ -17,7 +17,7 @@ class ValidUser
         $user = Auth::user(); // Obtener el usuario autenticado
 
         // Verificar si el usuario está autenticado y su ID es 1, 2 o 3
-        if ($user && in_array($user->id, [1, 2, 3])) {
+        if ($user && in_array($user->id, [1, 2, 3, 6])) {
             // Verificar si el usuario tiene permiso para ver el recurso
             if ($user) {
 

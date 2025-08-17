@@ -8,17 +8,18 @@ use Maatwebsite\Excel\Concerns\FromView;
 
 class ExportInfo implements FromView
 {
+
     public $id;
 
-    public function __construct($id)
-    {
+    public function __construct($id) {
         $this->id = $id;
     }
 
     public function view(): View
     {
-        return view('export.exportinfo', [
-            'exportacion' => exportacion::whereIn('id', $this->id)->orderby('eta', 'ASC')->orderby('cliente', 'DESC')->orderby('motonave', 'ASC')->orderby('consignatario', 'ASC')->get()
-        ]);
+            return view('export.exportinfo',[
+                'exportacion' => exportacion::whereIn('id', $this->id)->orderby('eta','ASC')->orderby('motonave','ASC')->orderby('cliente','DESC')->orderby('consignatario', 'ASC')->orderby('created_at', 'ASC')->get()
+            ]);
     }
+
 }

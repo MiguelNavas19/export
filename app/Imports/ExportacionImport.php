@@ -2,18 +2,14 @@
 
 namespace App\Imports;
 
-use App\Models\Color;
-use App\Models\Estatus;
-use App\Models\exportacion;
-use App\Models\Medida;
-use App\Models\Naviera;
-use App\Models\Puertos;
-use App\Models\Tipo;
+use App\Models\{Bitacora, Color, Estatus, exportacion, Medida, Naviera, Puertos, Tipo};
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
-use Illuminate\Support\Str;
+
 
 class ExportacionImport implements ToCollection
 {
@@ -67,6 +63,7 @@ class ExportacionImport implements ToCollection
                 // Solo crear registros si no estamos en modo preview
                 if (!$this->previewMode) {
                     exportacion::create($preparedData);
+                    $this->createBitacoraEntry('nuevo registro', $preparedData);
                 }
 
                 $this->created++;
@@ -83,6 +80,14 @@ class ExportacionImport implements ToCollection
     protected function hasRequiredFields($row): bool
     {
         return isset($row[2], $row[5], $row[0]) && $row[0] !== '' && $row[2] !== '' && $row[5] !== '';
+    }
+    protected function createBitacoraEntry($antes, $despues)
+    {
+        Bitacora::create([
+            'id_usuario' => Auth::id(),
+            'antes' => $antes,
+            'despues' => json_encode($despues)
+        ]);
     }
 
     protected function recordExists(?string $expediente, string $bl): bool

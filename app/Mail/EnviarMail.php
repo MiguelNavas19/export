@@ -14,21 +14,32 @@ class EnviarMail extends Mailable
     use Queueable, SerializesModels;
 
     public $bl;
+    public $puerto;
 
-    public function __construct($bl)
+    public function __construct($bl, $puerto)
     {
         $this->bl = $bl;
+        $this->puerto = $puerto;
     }
 
     public function envelope(): Envelope
     {
 
-      // Definir las direcciones de correo electrónico en variables para mayor claridad
-        $fromAddress = new Address('operaciones@exportar.salvadordelaplaza.com', 'Machado & Guedez');
+
+        if ($this->puerto == 1) {
+            $correo = "mglaguaira@exportar.salvadordelaplaza.com";
+            $correocopia = "mglaguaira@mgasociadosve.com";
+        } else {
+            $correo = "mgguanta@exportar.salvadordelaplaza.com";
+            $correocopia = "mgguanta@mgasociadosve.com";
+        }
+
+        // Definir las direcciones de correo electrónico en variables para mayor claridad
+        $fromAddress = new Address($correo, 'MG Asociados');
         $ccAddresses = [
-            new Address('operaciones@machadoyguedez.com', 'Operaciones')
+            new Address($correocopia, 'Operaciones')
         ];
-        
+
         // Crear el asunto del correo
         $subject = sprintf('Solicitud de estatus de liberación y días libres del BL %s', $this->bl);
         // Retornar un nuevo Envelope

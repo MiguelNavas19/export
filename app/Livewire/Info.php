@@ -356,7 +356,7 @@ class Info extends Component
 
 
             // Envío de notificaciones
-            //$this->enviarNotificaciones($exp);
+            $this->enviarNotificaciones($exp);
 
             DB::commit();
             $this->resetUI();
@@ -468,7 +468,7 @@ class Info extends Component
     {
         if ($exp->tipolinea->datosnaviera->isNotEmpty()) {
             $emails = $exp->tipolinea->datosnaviera->pluck('email')->toArray();
-            SendMailJob::dispatch($emails, $this->bl);
+            SendMailJob::dispatch($emails, $this->bl, $exp->id_puerto);
             $exp->update(['send' => true]);
         }
     }
@@ -606,9 +606,7 @@ class Info extends Component
             if ($data->tipolinea->datosnaviera->count() > 0) {
 
                 $emails = collect($data->tipolinea->datosnaviera)->pluck('email')->toArray();
-
-
-                SendMailJob::dispatch($emails, $data->bl);
+                SendMailJob::dispatch($emails, $data->bl, $data->id_puerto);
                 $this->dispatch('alertamensaje', 'success',  'Exito', 'Correo enviado con exito');
                 $data->update(['send' => true]);
             } else {

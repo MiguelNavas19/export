@@ -18,46 +18,96 @@
 
         }
 
-    table {
-        font-size: 10px; /* Tamaño un poco más grande para mejor legibilidad */
-        width: 100%;
-        border-collapse: collapse;
-        table-layout: auto;
-        word-wrap: break-word;
-    }
-    
-    th, td {
-        padding: 4px;
-        border: 1px solid black;
-        text-align: center;
-        white-space: normal; /* Permite saltos de línea */
-        word-break: break-word; /* Rompe palabras largas */
-        max-width: 120px; /* Ancho máximo para forzar ajuste */
-        vertical-align: top; /* Alinea el contenido en la parte superior */
-    }
-    
-    thead {
-        background: rgb(154, 224, 154);
-    }
-    
-    /* Ajustes específicos para columnas críticas */
-    td:nth-child(1), th:nth-child(1) { /* CLIENTE */
-        max-width: 100px;
-    }
-    
-    td:nth-child(3), th:nth-child(3) { /* CONSIGNATARIO */
-        max-width: 150px;
-    }
-    
-    td:nth-child(9), th:nth-child(9) { /* MOTONAVE */
-        max-width: 130px;
-    }
+        table {
+            font-size: 10px;
+            /* Tamaño un poco más grande para mejor legibilidad */
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: auto;
+            word-wrap: break-word;
+        }
+
+        th,
+        td {
+            padding: 4px;
+            border: 1px solid black;
+            text-align: center;
+            white-space: normal;
+            /* Permite saltos de línea */
+            word-break: break-word;
+            /* Rompe palabras largas */
+            max-width: 120px;
+            /* Ancho máximo para forzar ajuste */
+            vertical-align: top;
+            /* Alinea el contenido en la parte superior */
+        }
+
+        thead {
+            background: rgb(154, 224, 154);
+        }
+
+        /* Ajustes específicos para columnas críticas */
+        td:nth-child(1),
+        th:nth-child(1) {
+            /* CLIENTE */
+            max-width: 100px;
+        }
+
+        td:nth-child(3),
+        th:nth-child(3) {
+            /* CONSIGNATARIO */
+            max-width: 150px;
+        }
+
+        td:nth-child(9),
+        th:nth-child(9) {
+            /* MOTONAVE */
+            max-width: 130px;
+        }
+
+        .logo-container {
+            display: table;
+            width: 150%;
+            height: 20%;
+        }
+
+        .logo-cell {
+            display: table-cell;
+            vertical-align: middle;
+        }
+
+        .company-info {
+            text-align: left;
+            padding-left: 20px;
+        }
+
+        .company-name {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            line-height: 1.2;
+        }
+
+        .company-description {
+            font-size: 14px;
+            line-height: 1.2;
+            text-indent: 80px;
+        }
     </style>
 </head>
 
 <body class="cuerpo">
     <div align='center'>
-        <img width="80%" height="20%" src="{{ public_path() . '/storage/img/cabecera.png' }}">
+        <div class="logo-container">
+            <div class="logo-cell">
+                <img src="{{ public_path() . '/storage/img/mgasociados.png' }}" class="logo-img">
+            </div>
+            <div class="logo-cell company-info">
+                <div class="company-name">Consultores Generales del Comercio Internacional,
+                    C.A.</div>
+                <div class="company-description">Agentes de Aduana – Agentes Logísticos</div>
+            </div>
+        </div>
     </div>
 
     <br>

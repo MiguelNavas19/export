@@ -15,6 +15,6 @@ class Naviera extends Model
 
     public function datosnaviera()
     {
-        return $this->hasMany(DatosNaviera::class, 'id_naviera');
+        return $this->hasMany(DatosNaviera::class, 'id_naviera')->where('estatus', true);
     }
 }

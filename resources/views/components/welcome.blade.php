@@ -3,7 +3,7 @@
     <livewire:cierre />
 @endif
 
-<div class="bg-gray-200 dark:bg-gray-800 bg-opacity-25 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 p-6 lg:p-8"
+<div class="bg-gray-200 dark:bg-gray-800 bg-opacity-25 grid grid-cols-1  gap-6 lg:gap-8 p-6 lg:p-8"
     x-data="excelUploader()">
     @if (!in_array(Auth::user()->id, [7]))
         <div x-data="{
@@ -105,12 +105,14 @@
                     class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
                     @change="file = $event.target.files[0]; success = null; error = null;" :disabled="processing">
                 <button @click="uploadFile" :disabled="loading || processing"
-                    class="ml-2 items-center px-4 py-2 bg-black dark:bg-white border border-transparent rounded-md font-semibold text-xs text-white dark:text-black uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 transition ease-in-out duration-150">
+                    class="ml-2 items-center px-4 py-2 bg-gray-500 dark:bg-white border border-transparent rounded-md font-semibold text-xs text-white dark:text-black uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 transition ease-in-out duration-150">
 
                     <span x-show="!loading">Previsualizar Importación</span>
                     <span x-show="loading">Procesando...</span>
                 </button>
 
+            </div>
+            <div>
                 <p x-show="error" x-text="error" class="text-red-500 mt-2"></p>
                 <p x-show="success" x-text="success" class="text-green-500 mt-2"></p>
             </div>
@@ -204,7 +206,7 @@
 
 
 
-                        <button x-show="!importDone && summary.errors === 0"
+                        <button x-show="!importDone && summary.valid > 0"
                             class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700" @click="confirmImport"
                             :disabled="processing">
 
@@ -230,15 +232,16 @@
             </div>
         </div>
 
-
-        <button @click="nuevocliente()"
-            class="ml-2 items-center px-4 py-2 bg-black dark:bg-white border border-transparent rounded-md font-semibold text-xs text-white dark:text-black uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 transition ease-in-out duration-150">
-            Nuevo Cliente
-        </button>
+        
+            <button @click="nuevocliente()"
+                class="ml-2 items-center px-4 py-2 dark:bg-green-400 bg-black border border-transparent rounded-md font-semibold text-xs text-white dark:text-black uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 transition ease-in-out duration-150">
+                Nuevo Cliente
+            </button>
+       
     @endif
     @if (in_array(Auth::user()->id, [1, 2, 3, 4, 6]))
         <button @click="infocerrado()"
-            class="ml-2 items-center px-4 py-2 bg-black dark:bg-white border border-transparent rounded-md font-semibold text-xs text-white dark:text-black uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 transition ease-in-out duration-150">
+            class="ml-2 items-center px-4 py-2 bg-red-400 dark:bg-red-400 border border-transparent rounded-md font-semibold text-xs text-white dark:text-black uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 transition ease-in-out duration-150">
             Exportar Información (Cerrados)
         </button>
     @endif

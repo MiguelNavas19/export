@@ -847,7 +847,7 @@ class ReportExportNew implements WithStyles, ShouldAutoSize
 
         $sheet->getStyle('C40:D40')->getFont()->setBold(true)->setSize(12);
         $sheet->mergeCells('C40:D40');
-        $sheet->setCellValue('A40', $registro->fecha_factura);
+        $sheet->setCellValue('C40', $registro->fecha_factura);
         $sheet->getStyle('C40:D40')->getAlignment()->setHorizontal('left');
 
 
@@ -868,6 +868,8 @@ class ReportExportNew implements WithStyles, ShouldAutoSize
             ->getAllBorders()
             ->setBorderStyle(Border::BORDER_THIN);
         $sheet->mergeCells('E40:F40');
+        $sheet->setCellValue('E40', $registro->fecha_despacho);
+        $sheet->getStyle('E40:F40')->getAlignment()->setHorizontal('left');
 
 
 

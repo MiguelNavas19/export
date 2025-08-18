@@ -2,95 +2,166 @@
 
 namespace App\Imports;
 
-use App\Models\exportacion;
+use App\Models\Color;
+use App\Models\Estatus;
+use App\Models\Exportacion;
+use App\Models\Medida;
+use App\Models\Naviera;
+use App\Models\Puertos;
+use App\Models\Tipo;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
-
+use PhpOffice\PhpSpreadsheet\Shared\Date;
+use Illuminate\Support\Str;
 
 class ExportacionImport implements ToCollection
 {
+    public int $created = 0;
+    public int $errors = 0;
 
-    public $c;
-    public $e;
-
-    public function collection(Collection $row)
+    public function collection(Collection $rows)
     {
+        $rows->each(function ($row, $index) {
+            if ($index === 0) return; // Skip header row
 
-        $i = 0;
-        $c = 0;
-        $e = 0;
-        foreach ($row as $rows) {
-            if ($i > 0) {
-
-                $fecha = $rows[5];
-
-                if (isset($fecha) && $fecha !== '') {
-                    // Verificar si $fecha es una instancia de Carbon
-                    if (!$fecha instanceof Carbon) {
-                        // Convertir a Carbon si no lo es
-                        $fecha = Carbon::parse($fecha);
-                    }
-
-                    // Formatear la fecha a 'Y-m-d'
-                    $fecha = $fecha->format('Y-m-d');
-
-                    // Verificar si el valor en $rows[5] es numérico y convertirlo a fecha
-                    if (is_numeric($rows[5])) {
-                        $fecha = Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($rows[5]));
-                        $fecha = $fecha->format('Y-m-d');
-                    }
-                }
-
-
-                if (isset($rows[1], $rows[2], $rows[8]) && $rows[1] !== '' && $rows[2] !== '' && $rows[8] !== '') {
-
-
-                   $consulta = exportacion::where(function ($query) use ($rows) {
-                            if(isset($rows[0]) && $rows[0] !== ''){
-                                $query->where('bl', $rows[2])
-                                ->orWhere('expediente', $rows[0]);
-                            }else{
-                                $query->where('bl', $rows[2]);
-                            }
-                        })
-                        ->get();
-
-                        $liberacion = False;
-                        if (strcasecmp($rows[12], 'SI') == 0) {
-                            $liberacion = True;
-                        }
-
-                    if (count($consulta) == 0) {
-                        exportacion::create([
-                            "expediente" => $rows[0],
-                            "consignatario" => $rows[1],
-                            "bl" => $rows[2],
-                            "tipo" => $rows[3],
-                            "contenedor" => $rows[4],
-                            "eta" => $fecha,
-                            "obs" => $rows[6],
-                            "motonave" => $rows[7],
-                            "cliente" => $rows[8],
-                            "linea" => $rows[9],
-                            "envio" => $rows[10],
-                            "estatus" => $rows[11],
-                            "liberacion" => $liberacion,
-                            "renuncia" => $rows[13],
-                        ]);
-                        $c++;
-                    } else {
-                        $e++;
-                    }
-                } else {
-                    $e++;
-                }
+            if (!$this->hasRequiredFields($row)) {
+                $this->errors++;
+                return;
             }
 
-            $i++;
+            if ($this->recordExists(strtoupper(Str::squish($row[1])), strtoupper(Str::squish($row[5])))) {
+                $this->errors++;
+                return;
+            }
+
+            Exportacion::create($this->prepareData($row));
+            $this->created++;
+        });
+    }
+
+    protected function hasRequiredFields($row): bool
+    {
+        return isset($row[2], $row[5], $row[0]) && $row[0] !== '' && $row[2] !== '' && $row[5] !== '';
+    }
+
+    protected function recordExists(?string $expediente, string $bl): bool
+    {
+        $query = Exportacion::where('bl', $bl);
+
+        if (!empty($expediente)) {
+            $query->orWhere('expediente', $expediente);
         }
 
-        $this->c = $c;
-        $this->e = $e;
+        return $query->exists();
+    }
+
+    protected function prepareData($row): array
+    {
+
+        return [
+            'cliente'     => strtoupper(Str::squish($row[0])),
+            'expediente'   => strtoupper(Str::squish($row[1])) ?? null,
+            'consignatario' => strtoupper(Str::squish($row[2])),
+            'renuncia'    => strtoupper(Str::squish($row[3])) ?? null,
+            'poder'  => $this->autorizado($row[4]),
+            'bl'          => strtoupper(Str::squish($row[5])),
+            'contenedor'  => strtoupper(Str::squish($row[6])) ?? null,
+            'cantidad_equipos'  => strtoupper(Str::squish($row[7])) ?? null,
+            'tipo'        => $this->tiponame(strtoupper(Str::squish($row[8])), 1),
+            'descripcion'  => strtoupper(Str::squish($row[9])) ?? null,
+            'peso'  => strtoupper(Str::squish($row[10])) ?? null,
+            'eta'         => $this->parseDate($row[11] ?? null),
+            'motonave'    => strtoupper(Str::squish($row[12])) ?? null,
+            'fecha_arribo'         => $this->parseDate($row[13] ?? null),
+            'linea'       => $this->tiponame(strtoupper(Str::squish($row[14])), 2),
+            'id_puerto'       => $this->tiponame(strtoupper(Str::squish($row[15])), 3),
+            'obs'         => strtoupper(Str::squish($row[16])) ?? null,
+            'envio'       => $this->tiponame(strtoupper(Str::squish($row[17])), 4),
+            'estatus'       => $this->tiponame(strtoupper(Str::squish($row[18])), 5),
+            'autorizado' => $this->autorizado($row[19]),
+            'fecha_pago'         => $this->parseDate($row[20] ?? null),
+            'fecha_veconinter'         => $this->parseDate($row[21] ?? null),
+            'fecha_registro'         => $this->parseDate($row[22] ?? null),
+            'dua'         => strtoupper(Str::squish($row[23])) ?? null,
+            'fecha_impuesto'         => $this->parseDate($row[24] ?? null),
+            'funcionario'         => strtoupper(Str::squish($row[25])) ?? null,
+            'color'       => $this->tiponame(strtoupper(Str::squish($row[26])), 6),
+            'fecha_presentacion'         => $this->parseDate($row[27] ?? null),
+            'fecha_reconocimiento'         => $this->parseDate($row[28] ?? null),
+            'fecha_validacion'         => $this->parseDate($row[29] ?? null),
+            'fecha_despacho'         => $this->parseDate($row[30] ?? null),
+            'fecha_devolucion'         => $this->parseDate($row[31] ?? null),
+            'factura'         => strtoupper(Str::squish($row[32])) ?? null,
+            'fecha_factura'         => $this->parseDate($row[33] ?? null),
+            'dias_libres'         => $this->parseDate($row[34] ?? null),
+            'liberacion'  => $this->parseLiberation($row[35] ?? null),
+            'fecha_entrega'         => $this->parseDate($row[36] ?? null),
+
+        ];
+    }
+
+    protected function parseDate($value): ?string
+    {
+        if (blank($value)) {
+            return null;
+        }
+
+        try {
+            if (is_numeric($value)) {
+                return Carbon::instance(Date::excelToDateTimeObject($value))
+                    ->format('Y-m-d');
+            }
+
+            return Carbon::parse($value)->format('Y-m-d');
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    protected function parseLiberation($value): bool
+    {
+        return strcasecmp(trim($value ?? ''), 'SI') === 0;
+    }
+
+    protected function autorizado($value): int
+    {
+        return strcasecmp(trim($value ?? ''), 'SI') === 0 ? 2 : 1;
+    }
+
+
+    private function tiponame($tipo, $nro)
+    {
+
+        if ($nro == 1) {
+
+            return Medida::where('status', true)->where('nombre', $tipo)->value('nombre') ?? null;
+        }
+
+        if ($nro == 2) {
+
+            return Naviera::where('status', true)->where('nombre', $tipo)->value('id') ?? null;
+        }
+
+        if ($nro == 3) {
+
+            return Puertos::where('status', true)->where('nombre', $tipo)->value('id') ?? null;
+        }
+
+
+        if ($nro == 4) {
+
+            return Tipo::where('nombre', $tipo)->value('id') ?? null;
+        }
+
+        if ($nro == 5) {
+
+            return Estatus::where('nombre', $tipo)->value('id') ?? null;
+        }
+
+        if ($nro == 6) {
+
+            return Color::where('status', true)->where('nombre', $tipo)->value('id') ?? 0;
+        }
     }
 }

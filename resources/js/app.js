@@ -98,7 +98,7 @@ window.dateRange = function () {
 
 window.eliminar = function (id) {
     Swal.fire({
-        title: "¢ÄSeguro?",
+        title: "Seguro?",
         text: "Desea eliminar este registro?",
         icon: "warning",
         showCancelButton: true,
@@ -115,7 +115,7 @@ window.eliminar = function (id) {
 
 window.pdfbl = (id, datos) =>
     window.dispatchEvent(
-      new CustomEvent('pdfbl', { detail: { id, datos } })
+        new CustomEvent('pdfbl', { detail: { id, datos } })
     );
 
 Livewire.on("errormensaje", function (icono) {

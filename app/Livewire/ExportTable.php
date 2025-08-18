@@ -3,7 +3,7 @@
 namespace App\Livewire;
 
 use App\Exports\ExportInfo;
-use App\Exports\ReportExport;
+use App\Exports\ReportExportNew;
 use App\Models\exportacion;
 use Carbon\Carbon;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
@@ -122,14 +122,55 @@ class ExportTable extends DataTableComponent
 
             Column::make('renuncia')->collapseAlways(),
             Column::make('ultima actualizacion', 'updated_at')->collapseAlways(),
-             Column::make('Fecha de Creacion', 'created_at')->collapseAlways(),
-            Column::make('Fecha de pago','fecha_pago')
-            ->sortable(),
-            Column::make('Fecha de entrega','fecha_entrega')
-            ->sortable(),
-             Column::make('Fecha veconinter','fecha_veconinter')
-            ->sortable(),
-
+            Column::make('Fecha de Creacion', 'created_at')->collapseAlways(),
+            Column::make('Fecha de pago', 'fecha_pago')
+                ->sortable(),
+            Column::make('Fecha de entrega', 'fecha_entrega')
+                ->sortable(),
+            Column::make('Fecha veconinter', 'fecha_veconinter')
+                ->sortable(),
+            Column::make('Fecha Despacho', 'fecha_despacho')
+                ->sortable(),
+            Column::make('Fecha Devolucion', 'fecha_devolucion')
+                ->sortable(),
+            Column::make('Fecha Arribo', 'fecha_arribo')
+                ->sortable(),
+            Column::make('Fecha Registro', 'fecha_registro')
+                ->sortable(),
+            Column::make('Fecha pago impuestos', 'fecha_impuesto')
+                ->sortable(),
+            Column::make('Fecha Presentacion', 'fecha_presentacion')
+                ->sortable(),
+            Column::make('Fecha Reconocimiento', 'fecha_reconocimiento')
+                ->sortable(),
+            Column::make('Fecha Validacion', 'fecha_validacion')
+                ->sortable(),
+            Column::make('Factura', 'factura')
+                ->sortable(),
+            Column::make('Fecha Factura', 'fecha_factura')
+                ->sortable(),
+            Column::make('Dias Libres', 'dias_libres')
+                ->sortable(),
+            Column::make('Cliente tiene poder', 'poder')
+                ->sortable()->format(function ($value) {
+                    return $value == 2 ? 'SI' : 'NO';
+                }),
+            Column::make('Cantidad Equipos', 'cantidad_equipos')
+                ->sortable(),
+            Column::make('Funcionario', 'funcionario')
+                ->sortable(),
+            Column::make('Descripcion', 'descripcion')
+                ->sortable(),
+            Column::make('Peso', 'peso')
+                ->sortable(),
+            Column::make('Dua', 'dua')
+                ->sortable(),
+            Column::make('Autorizado Imprimir BL', 'autorizado')
+                ->sortable()->format(function ($value) {
+                    return $value == 2 ? 'SI' : 'NO';
+                }),
+            Column::make('Color', 'colors.nombre')
+                ->sortable(),
             Column::make('Actions')->label(
                 fn($row, Column $column) => view('livewire.estatus', [
                     'valor' => 'BOTON',
@@ -276,16 +317,15 @@ class ExportTable extends DataTableComponent
 
             $this->clearSelected();
             if (count($id) > 0) {
-              $data = exportacion::whereIn('id', $id)->orderby('eta', 'ASC')->orderby('cliente', 'ASC')->orderby('motonave', 'ASC')->orderby('consignatario', 'ASC')->get();
+                $data = exportacion::whereIn('id', $id)->orderby('eta', 'ASC')->orderby('cliente', 'ASC')->orderby('motonave', 'ASC')->orderby('consignatario', 'ASC')->get();
 
-              $pdf = Pdf::loadView('pdf.pdfestatus', compact('data'))->setPaper('a4', 'landscape');
+                $pdf = Pdf::loadView('pdf.pdfestatus', compact('data'))->setPaper('a4', 'landscape');
 
                 return response()->streamDownload(function () use ($pdf) {
                     // Aquí simplemente se debe llamar a la función que genera el PDF.
                     echo $pdf->stream(); // o cualquier método que use para obtener el contenido del PDF
                 }, 'exportacionestatus.pdf');
             }
-
         } catch (Exception $e) {
 
             $this->dispatch('errormensaje', 'error',  'Error', $e->getMessage());
@@ -301,7 +341,7 @@ class ExportTable extends DataTableComponent
 
         $this->clearSelected();
         if (count($id) > 0) {
-            return Excel::download(new ReportExport($id), 'plantillacarpeta.xlsx');
+            return Excel::download(new ReportExportNew($id), 'plantillacarpeta.xlsx');
         }
     }
 

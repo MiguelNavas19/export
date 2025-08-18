@@ -71,7 +71,7 @@ class Info extends Component
     public $peso = '';
     public $dua = '';
     public $autorizado = 1;
-    public $color;
+    public $color = 0;
 
     public $rif = '';
 

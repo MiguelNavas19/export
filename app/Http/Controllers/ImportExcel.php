@@ -8,13 +8,35 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class ImportExcel extends Controller
 {
+
+    public function preview(Request $request)
+    {
+        $request->validate(['file' => 'required|mimes:xlsx,xls']);
+
+        $import = new ExportacionImport(previewMode: true);
+        Excel::import($import, $request->file('file'));
+
+        return response()->json([
+            'results' => $import->results,
+            'summary' => [
+                'total' => count($import->results),
+                'valid' => $import->created,
+                'errors' => $import->errors
+            ]
+        ]);
+    }
+
+
+
     public function imports(Request $request)
     {
 
         try {
             // Supongamos que $import es el resultado de la importación
-            $import = new ExportacionImport;
-            Excel::import($import, $request->file('excel'));
+            $request->validate(['file' => 'required|mimes:xlsx,xls']);
+
+            $import = new ExportacionImport(previewMode: false);
+            Excel::import($import, $request->file('file'));
             $mensaje = "Registros cargados con exito " . $import->created . " <br> no se cargaron " . $import->errors . " registros";
             return response()->json([
                 'success' => true,

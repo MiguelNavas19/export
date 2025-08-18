@@ -19,24 +19,64 @@ class ExportacionImport implements ToCollection
 {
     public int $created = 0;
     public int $errors = 0;
+    public array $results = [];
+    public bool $previewMode = true; // Nuevo: modo de previsualización
+
+    public function __construct(bool $previewMode = true)
+    {
+        $this->previewMode = $previewMode;
+    }
 
     public function collection(Collection $rows)
     {
         $rows->each(function ($row, $index) {
-            if ($index === 0) return; // Skip header row
+            if ($index === 0) return;
+
+            $result = [
+                'row' => $index + 1,
+                'data' => null,
+                'error' => false,
+                'message' => '',
+                'exists' => false
+            ];
 
             if (!$this->hasRequiredFields($row)) {
                 $this->errors++;
+                $result['error'] = true;
+                $result['message'] = 'Faltan campos requeridos';
+                $this->results[] = $result;
                 return;
             }
 
-            if ($this->recordExists(strtoupper(Str::squish($row[1])), strtoupper(Str::squish($row[5])))) {
+            $expediente = strtoupper(Str::squish($row[1] ?? null));
+            $bl = strtoupper(Str::squish($row[5]));
+
+            if ($this->recordExists($expediente, $bl)) {
                 $this->errors++;
+                $result['error'] = true;
+                $result['exists'] = true;
+                $result['message'] = 'Registro ya existe';
+                $this->results[] = $result;
                 return;
             }
 
-            Exportacion::create($this->prepareData($row));
-            $this->created++;
+            try {
+                $preparedData = $this->prepareData($row);
+                $result['data'] = $preparedData;
+
+                // Solo crear registros si no estamos en modo preview
+                if (!$this->previewMode) {
+                    Exportacion::create($preparedData);
+                }
+
+                $this->created++;
+            } catch (\Exception $e) {
+                $this->errors++;
+                $result['error'] = true;
+                $result['message'] = 'Error: ' . $e->getMessage();
+            }
+
+            $this->results[] = $result;
         });
     }
 

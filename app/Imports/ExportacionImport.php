@@ -4,7 +4,7 @@ namespace App\Imports;
 
 use App\Models\Color;
 use App\Models\Estatus;
-use App\Models\Exportacion;
+use App\Models\exportacion;
 use App\Models\Medida;
 use App\Models\Naviera;
 use App\Models\Puertos;
@@ -66,7 +66,7 @@ class ExportacionImport implements ToCollection
 
                 // Solo crear registros si no estamos en modo preview
                 if (!$this->previewMode) {
-                    Exportacion::create($preparedData);
+                    exportacion::create($preparedData);
                 }
 
                 $this->created++;
@@ -87,7 +87,7 @@ class ExportacionImport implements ToCollection
 
     protected function recordExists(?string $expediente, string $bl): bool
     {
-        $query = Exportacion::where('bl', $bl);
+        $query = exportacion::where('bl', $bl);
 
         if (!empty($expediente)) {
             $query->orWhere('expediente', $expediente);

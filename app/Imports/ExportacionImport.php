@@ -139,7 +139,7 @@ class ExportacionImport implements ToCollection
             'fecha_devolucion'         => $this->parseDate($row[31] ?? null),
             'factura'         => strtoupper(Str::squish($row[32])) ?? null,
             'fecha_factura'         => $this->parseDate($row[33] ?? null),
-            'dias_libres'         => $this->parseDate($row[34] ?? null),
+            'dias_libres'         => strtoupper(Str::squish($row[34])) ?? null,
             'liberacion'  => $this->parseLiberation($row[35] ?? null),
             'fecha_entrega'         => $this->parseDate($row[36] ?? null),
 

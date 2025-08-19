@@ -194,7 +194,6 @@ class Info extends Component
             $this->fechapresentacion =  $this->parseDate($this->fechapresentacion);
             $this->fechareconocimiento = $this->parseDate($this->fechareconocimiento);
             $this->fechavalidacion = $this->parseDate($this->fechavalidacion);
-            $this->diaslibres = $this->parseDate($this->diaslibres);
             $this->fechafactura = $this->parseDate($this->fechafactura);
             $this->fechapago = $this->parseDate($this->fechapago);
             $this->fechaentrega = $this->parseDate($this->fechaentrega);
@@ -255,7 +254,7 @@ class Info extends Component
             'fecha_reconocimiento' => $this->fechareconocimiento,
             'fecha_validacion' => $this->fechavalidacion,
             'fecha_factura' => $this->fechafactura,
-            'dias_libres' => $this->diaslibres,
+            'dias_libres' => trim($this->diaslibres),
             'factura' => trim($this->factura),
             'poder' => $this->poder,
             'cantidad_equipos' => trim($this->cantidadequipos),
@@ -318,7 +317,6 @@ class Info extends Component
             $fechapresentacion =  $this->parseDate($this->fechapresentacion);
             $fechareconocimiento = $this->parseDate($this->fechareconocimiento);
             $fechavalidacion = $this->parseDate($this->fechavalidacion);
-            $diaslibres = $this->parseDate($this->diaslibres);
             $fechafactura = $this->parseDate($this->fechafactura);
             $fechapago = $this->parseDate($this->fechapago);
             $fechaentrega = $this->parseDate($this->fechaentrega);
@@ -344,7 +342,6 @@ class Info extends Component
                 $fechapresentacion,
                 $fechareconocimiento,
                 $fechavalidacion,
-                $diaslibres,
                 $fechafactura,
                 $tipo,
                 $fechapago,
@@ -416,7 +413,6 @@ class Info extends Component
         $fechapresentacion,
         $fechareconocimiento,
         $fechavalidacion,
-        $diaslibres,
         $fechafactura,
         $tipo,
         $fechapago,
@@ -448,7 +444,7 @@ class Info extends Component
             'fecha_reconocimiento' => $fechareconocimiento,
             'fecha_validacion' => $fechavalidacion,
             'fecha_factura' => $fechafactura,
-            'dias_libres' => $diaslibres,
+            'dias_libres' => trim($this->diaslibres),
             'factura' => trim($this->factura),
             'poder' => $this->poder,
             'cantidad_equipos' => trim($this->cantidadequipos),

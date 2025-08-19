@@ -322,7 +322,7 @@
 
                             <div>
                                 <x-label>Dias Libres</x-label>
-                                <x-input wire:model='diaslibres' type='date'
+                                <x-input wire:model='diaslibres' type='text'
                                     class="block w-full rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
                                 </x-input>
                             </div>
@@ -634,7 +634,7 @@
 
                         <div>
                             <x-label>Dias Libres</x-label>
-                            <x-input wire:model='diaslibres' type='date'
+                            <x-input wire:model='diaslibres' type='text'
                                 class="block w-full rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
                             </x-input>
                         </div>

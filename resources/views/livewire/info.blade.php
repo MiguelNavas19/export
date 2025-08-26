@@ -92,12 +92,12 @@
     @elseif($nuevocliente)
         <div x-data="validarnuevocliente()">
             <form @submit.prevent="ingresarnuevos">
-                <x-dialog-modal maxWidth='4xl' wire:model='opensave'>
+                <x-dialog-modal maxWidth='5xl' wire:model='opensave'>
                     <x-slot name="title">
                         Nuevo cliente
                     </x-slot>
                     <x-slot name="content">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                             <div>
                                 <x-label>Cliente</x-label>
                                 <x-input required wire:model='cliente'
@@ -297,6 +297,50 @@
                                 <x-input wire:model='fechaimpuesto' type='date'
                                     class="block w-full rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
                                 </x-input>
+
+
+                            </div>
+
+
+                            <div>
+                                <x-label>Base</x-label>
+                                <x-input wire:model='base' type='number'
+                                    class="block w-full rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
+                                </x-input>
+                            </div>
+
+                            <div>
+                                <x-label>Fecha Validacion</x-label>
+                                <x-input wire:model='fechavalidacion' type='date'
+                                    class="block w-full rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
+                                </x-input>
+                            </div>
+
+                            <div>
+                                <x-label>Color</x-label>
+                                <select wire:model='color'
+                                    class="block w-full rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
+                                    <option value="0">Seleccione..</option>
+                                    @if ($colors)
+                                        @foreach ($colors as $color)
+                                            <option value="{{ $color->id }}">{{ $color->nombre }}</option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                            </div>
+
+                            <div>
+                                <x-label>Funcionario</x-label>
+                                <x-input wire:model='funcionario'
+                                    class="block w-full rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
+                                </x-input>
+                            </div>
+
+                            <div>
+                                <x-label>Almacen</x-label>
+                                <x-input wire:model='almacen'
+                                    class="block w-full rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
+                                </x-input>
                             </div>
 
                             <div>
@@ -313,12 +357,7 @@
                                 </x-input>
                             </div>
 
-                            <div>
-                                <x-label>Fecha Validacion</x-label>
-                                <x-input wire:model='fechavalidacion' type='date'
-                                    class="block w-full rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
-                                </x-input>
-                            </div>
+
 
                             <div>
                                 <x-label>Dias Libres</x-label>
@@ -358,12 +397,6 @@
                                 </x-input>
                             </div>
 
-                            <div>
-                                <x-label>Funcionario</x-label>
-                                <x-input wire:model='funcionario'
-                                    class="block w-full rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
-                                </x-input>
-                            </div>
 
                             <div>
                                 <x-label>Descripcion</x-label>
@@ -395,18 +428,7 @@
                                 </select>
                             </div>
 
-                            <div>
-                                <x-label>Color</x-label>
-                                <select wire:model='color'
-                                    class="block w-full rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
-                                    <option value="0">Seleccione..</option>
-                                    @if ($colors)
-                                        @foreach ($colors as $color)
-                                            <option value="{{ $color->id }}">{{ $color->nombre }}</option>
-                                        @endforeach
-                                    @endif
-                                </select>
-                            </div>
+
                         </div>
 
                     </x-slot>
@@ -421,12 +443,12 @@
         </div>
     @else
         <form wire:submit='actualizardatos'>
-            <x-dialog-modal maxWidth='4xl' wire:model='opensave'>
+            <x-dialog-modal maxWidth='5xl' wire:model='opensave'>
                 <x-slot name="title">
                     Editar
                 </x-slot>
                 <x-slot name="content">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                         <div>
                             <x-label>Cliente</x-label>
                             <x-input required wire:model='cliente'
@@ -612,6 +634,47 @@
                         </div>
 
                         <div>
+                            <x-label>Base</x-label>
+                            <x-input wire:model='base' type='number'
+                                class="block w-full rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
+                            </x-input>
+                        </div>
+
+                        <div>
+                            <x-label>Fecha Validacion</x-label>
+                            <x-input wire:model='fechavalidacion' type='date'
+                                class="block w-full rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
+                            </x-input>
+                        </div>
+
+                        <div>
+                            <x-label>Color</x-label>
+                            <select wire:model='color'
+                                class="block w-full rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
+                                <option value="">Seleccione..</option>
+                                @if ($colors)
+                                    @foreach ($colors as $color)
+                                        <option value="{{ $color->id }}">{{ $color->nombre }}</option>
+                                    @endforeach
+                                @endif
+                            </select>
+                        </div>
+
+                        <div>
+                            <x-label>Funcionario</x-label>
+                            <x-input wire:model='funcionario'
+                                class="block w-full rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
+                            </x-input>
+                        </div>
+
+                        <div>
+                            <x-label>Almacen</x-label>
+                            <x-input wire:model='almacen'
+                                class="block w-full rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
+                            </x-input>
+                        </div>
+
+                        <div>
                             <x-label>Fecha Presentacion</x-label>
                             <x-input wire:model='fechapresentacion' type='date'
                                 class="block w-full rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
@@ -625,12 +688,7 @@
                             </x-input>
                         </div>
 
-                        <div>
-                            <x-label>Fecha Validacion</x-label>
-                            <x-input wire:model='fechavalidacion' type='date'
-                                class="block w-full rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
-                            </x-input>
-                        </div>
+
 
                         <div>
                             <x-label>Dias Libres</x-label>
@@ -670,12 +728,7 @@
                             </x-input>
                         </div>
 
-                        <div>
-                            <x-label>Funcionario</x-label>
-                            <x-input wire:model='funcionario'
-                                class="block w-full rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
-                            </x-input>
-                        </div>
+
 
                         <div>
                             <x-label>Descripcion</x-label>
@@ -707,18 +760,7 @@
                             </select>
                         </div>
 
-                        <div>
-                            <x-label>Color</x-label>
-                            <select wire:model='color'
-                                class="block w-full rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
-                                <option value="">Seleccione..</option>
-                                @if ($colors)
-                                    @foreach ($colors as $color)
-                                        <option value="{{ $color->id }}">{{ $color->nombre }}</option>
-                                    @endforeach
-                                @endif
-                            </select>
-                        </div>
+
 
                     </div>
 

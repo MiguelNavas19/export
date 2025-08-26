@@ -72,6 +72,8 @@ class Info extends Component
     public $dua = '';
     public $autorizado = 1;
     public $color = 0;
+    public $base = 0;
+    public $almacen = '';
 
     public $rif = '';
 
@@ -164,6 +166,8 @@ class Info extends Component
             'dua' => 'dua',
             'autorizado' => 'autorizado',
             'color' => 'color',
+            'base' => 'base',
+            'almacen' => 'almacen'
         ];
 
         foreach ($propertyMap as $recordKey => $property) {
@@ -185,7 +189,6 @@ class Info extends Component
 
             $this->eta = $this->parseDate($this->eta);
             $this->fechaveconinter = $this->parseDate($this->fechaveconinter);
-
             $this->fechadespacho = $this->parseDate($this->fechadespacho);
             $this->fechadevolucion =  $this->parseDate($this->fechadevolucion);
             $this->fechaarribo = $this->parseDate($this->fechaarribo);
@@ -264,6 +267,8 @@ class Info extends Component
             'dua' => trim($this->dua),
             'autorizado' => $this->autorizado,
             'color' => $this->color,
+            'base' => $this->base,
+            'almacen' => $this->almacen
         ];
 
         // Actualizar usando el modelo existente
@@ -455,7 +460,9 @@ class Info extends Component
             'autorizado' => $this->autorizado,
             'color' => $this->color,
             'fecha_entrega' => $fechaentrega,
-            'fecha_pago' => $fechapago
+            'fecha_pago' => $fechapago,
+            'base' => $this->base,
+            'almacen' => $this->almacen
         ];
     }
 
@@ -509,7 +516,9 @@ class Info extends Component
             'autorizado',
             'color',
             'fechaentrega',
-            'fechapago'
+            'fechapago',
+            'base',
+            'almacen'
         ]);
     }
 

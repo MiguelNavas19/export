@@ -3,9 +3,9 @@
     <livewire:cierre />
 @endif
 
-<div class="bg-gray-200 dark:bg-gray-800 bg-opacity-25 grid grid-cols-1  gap-6 lg:gap-8 p-6 lg:p-8"
-    x-data="excelUploader()">
-    @if (!in_array(Auth::user()->id, [7]))
+
+@if (!in_array(Auth::user()->id, [7]))
+    <div class="bg-gray-200 dark:bg-gray-800 bg-opacity-25 grid grid-cols-1  gap-6 lg:gap-8 p-6 lg:p-8">
         <div x-data="{
             open: false,
             loading: false,
@@ -231,21 +231,30 @@
                 </div>
             </div>
         </div>
+    </div>
+@endif
 
-        
-            <button @click="nuevocliente()"
-                class="ml-2 items-center px-4 py-2 dark:bg-green-400 bg-black border border-transparent rounded-md font-semibold text-xs text-white dark:text-black uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 transition ease-in-out duration-150">
-                Nuevo Cliente
-            </button>
-       
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4" x-data>
+
+    @if (!in_array(Auth::user()->id, [7]))
+        <button @click="nuevocliente()"
+            class="mx-2 items-center px-4 py-2 dark:bg-green-400 bg-black border border-transparent rounded-md font-semibold text-xs text-white dark:text-black uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 transition ease-in-out duration-150">
+            Nuevo Cliente
+        </button>
     @endif
     @if (in_array(Auth::user()->id, [1, 2, 3, 4, 6]))
         <button @click="infocerrado()"
-            class="ml-2 items-center px-4 py-2 bg-red-400 dark:bg-red-400 border border-transparent rounded-md font-semibold text-xs text-white dark:text-black uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 transition ease-in-out duration-150">
+            class="mx-2 items-center px-4 py-2 bg-red-400 dark:bg-red-400 border border-transparent rounded-md font-semibold text-xs text-white dark:text-black uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 transition ease-in-out duration-150">
             Exportar Información (Cerrados)
+        </button>
+
+        <button @click="reconocimiento()"
+            class="mx-2 items-center px-4 py-2 bg-green-400 dark:bg-green-400 border border-transparent rounded-md font-semibold text-xs text-white dark:text-black uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 transition ease-in-out duration-150">
+            Reporte Reconocimiento
         </button>
     @endif
 </div>
+
 
 <div class="grid grid-cols-1  gap-6 lg:gap-8 p-6 lg:p-8">
     <livewire:export-table />

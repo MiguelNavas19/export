@@ -46,7 +46,9 @@ class exportacion extends Model
         'descripcion',
         'peso',
         'dua',
-        'autorizado'
+        'autorizado',
+        'almacen',
+        'base'
     ];
 
     public function tipoenvio()

@@ -2,7 +2,7 @@
     <form wire:submit='exportarcierre'>
         <x-dialog-modal maxWidth='2xl' wire:model='modal'>
             <x-slot name="title">
-              Exportar
+                {{ $titulo }}
             </x-slot>
             <x-slot name="content">
                 <div x-data="dateRange()" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">

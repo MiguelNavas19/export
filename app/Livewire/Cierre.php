@@ -13,17 +13,22 @@ class Cierre extends Component
     public $modal = false;
     public $desde;
     public $hasta;
-
-
+    public $titulo = 'Exportar Informacion Cerrados';
+    public $valor = 1;
 
     public function exportarcierre()
     {
 
-            if($this->desde <= $this->hasta){
-                return Excel::download(new ExportCerrados($this->desde,$this->hasta), 'datacerrados.xlsx');
+        if ($this->desde <= $this->hasta) {
+
+            if ($this->valor == 1) {
+                return Excel::download(new ExportCerrados($this->desde, $this->hasta, $this->valor), 'datacerrados.xlsx');
             }
 
-
+            if ($this->valor == 2) {
+                return Excel::download(new ExportCerrados($this->desde, $this->hasta, $this->valor), 'reconocimiento.xlsx');
+            }
+        }
     }
 
 
@@ -31,8 +36,19 @@ class Cierre extends Component
     public function nuevocliente()
     {
 
-        $this->reset(['desde','hasta']);
+        $this->reset(['desde', 'hasta']);
+        $this->valor = 1;
+        $this->modal = true;
+    }
 
+
+    #[On('reconocimiento')]
+    public function reconocimiento()
+    {
+
+        $this->reset(['desde', 'hasta']);
+        $this->titulo = 'Reporte Reconocimiento';
+        $this->valor = 2;
         $this->modal = true;
     }
 

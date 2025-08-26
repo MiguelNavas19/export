@@ -25,35 +25,7 @@ window.editarmasivamente = function (id) {
     window.dispatchEvent(event);
 };
 
-window.excelUploader = function () {
-    return {
-        async subirExcel() {
-            const csrfToken = document
-                .querySelector('[name="_token"]')
-                .getAttribute("value");
-            const formData = new FormData();
-            formData.append("excel", this.$refs.archivo.files[0]);
-            formData.append("_token", csrfToken);
 
-            try {
-                const response = await fetch("imports", {
-                    method: "POST",
-                    body: formData,
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    window.alertanew(data.message);
-                } else {
-                    window.alertanew("Error: " + data.message, "");
-                }
-            } catch (error) {
-                window.alertanew("Error: " + error.message, "");
-            }
-        },
-    };
-};
 
 Livewire.on("alertamensaje", function (icono) {
     Swal.fire({
@@ -76,6 +48,11 @@ window.nuevocliente = function () {
 
 window.infocerrado = function () {
     const event = new CustomEvent("infocerrado");
+    window.dispatchEvent(event);
+};
+
+window.reconocimiento = function () {
+    const event = new CustomEvent("reconocimiento");
     window.dispatchEvent(event);
 };
 

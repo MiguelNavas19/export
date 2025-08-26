@@ -139,12 +139,21 @@ class ExportTable extends DataTableComponent
                 ->sortable(),
             Column::make('Fecha pago impuestos', 'fecha_impuesto')
                 ->sortable(),
+            Column::make('Base', 'base')
+                ->sortable(),
+            Column::make('Fecha Validacion', 'fecha_validacion')
+                ->sortable(),
+            Column::make('Color', 'colors.nombre')
+                ->sortable(),
+            Column::make('Funcionario', 'funcionario')
+                ->sortable(),
+            Column::make('Almacen', 'almacen')
+                ->sortable(),
             Column::make('Fecha Presentacion', 'fecha_presentacion')
                 ->sortable(),
             Column::make('Fecha Reconocimiento', 'fecha_reconocimiento')
                 ->sortable(),
-            Column::make('Fecha Validacion', 'fecha_validacion')
-                ->sortable(),
+
             Column::make('Factura', 'factura')
                 ->sortable(),
             Column::make('Fecha Factura', 'fecha_factura')
@@ -157,8 +166,7 @@ class ExportTable extends DataTableComponent
                 }),
             Column::make('Cantidad Equipos', 'cantidad_equipos')
                 ->sortable(),
-            Column::make('Funcionario', 'funcionario')
-                ->sortable(),
+
             Column::make('Descripcion', 'descripcion')
                 ->sortable(),
             Column::make('Peso', 'peso')
@@ -169,8 +177,7 @@ class ExportTable extends DataTableComponent
                 ->sortable()->format(function ($value) {
                     return $value == 2 ? 'SI' : 'NO';
                 }),
-            Column::make('Color', 'colors.nombre')
-                ->sortable(),
+
             Column::make('Actions')->label(
                 fn($row, Column $column) => view('livewire.estatus', [
                     'valor' => 'BOTON',

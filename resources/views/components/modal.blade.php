@@ -10,6 +10,7 @@
         'xl' => 'sm:max-w-xl',
         '2xl' => 'sm:max-w-2xl',
         '4xl' => 'sm:max-w-4xl',
+        '5xl' => 'sm:max-w-5xl',
     ][$maxWidth ?? '2xl'];
 @endphp
 

@@ -79,6 +79,8 @@ class ExportTable extends DataTableComponent
         return [
             Column::make('id')->excludeFromColumnSelect()->hideIf(true)
                 ->sortable(),
+            Column::make('Dua', 'dua')->secondaryHeader($this->getFilterByKey('dua'))
+                ->sortable(),
             Column::make('expediente')->secondaryHeader($this->getFilterByKey('expediente'))
                 ->sortable(),
             Column::make('consignatario')->secondaryHeader($this->getFilterByKey('consignatario'))
@@ -171,8 +173,7 @@ class ExportTable extends DataTableComponent
                 ->sortable(),
             Column::make('Peso', 'peso')
                 ->sortable(),
-            Column::make('Dua', 'dua')
-                ->sortable(),
+
             Column::make('Autorizado Imprimir BL', 'autorizado')
                 ->sortable()->format(function ($value) {
                     return $value == 2 ? 'SI' : 'NO';
@@ -231,6 +232,14 @@ class ExportTable extends DataTableComponent
                 ])
                 ->filter(function (Builder $builder, string $value) {
                     $builder->where('expediente', 'like', '%' . $value . '%');
+                }),
+
+            TextFilter::make('dua')
+                ->config([
+                    'placeholder' => 'Buscar DUA',
+                ])
+                ->filter(function (Builder $builder, string $value) {
+                    $builder->where('dua', 'like', '%' . $value . '%');
                 }),
 
             TextFilter::make('contenedor')

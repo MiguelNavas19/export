@@ -39,7 +39,6 @@ class ExportCerrados implements FromView
         if ($this->valor == 2) {
             $vista = "export.exportreconocimiento";
             $consulta = exportacion::query()
-                ->where('estatus', 6)
                 ->whereBetween('fecha_registro', [$this->desde, $this->hasta])
                 ->orderBy('eta')
                 ->orderBy('motonave')

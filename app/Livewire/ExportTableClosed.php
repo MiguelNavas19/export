@@ -55,6 +55,7 @@ class ExportTableClosed extends DataTableComponent
         $this->setBulkActions([
             'export' => 'Exportar',
             'exportcarpeta' => 'Plantilla carpeta',
+            'exportestatus' => 'Exportar Estatus',
         ]);
 
 
@@ -71,10 +72,14 @@ class ExportTableClosed extends DataTableComponent
         });
     }
 
+
+  
     public function columns(): array
     {
         return [
             Column::make('id')->excludeFromColumnSelect()->hideIf(true)
+                ->sortable(),
+            Column::make('Dua', 'dua')->secondaryHeader($this->getFilterByKey('dua'))
                 ->sortable(),
             Column::make('expediente')->secondaryHeader($this->getFilterByKey('expediente'))
                 ->sortable(),
@@ -97,7 +102,7 @@ class ExportTableClosed extends DataTableComponent
                 ->sortable(),
 
             Column::make('linea')->hideIf(true),
-            Column::make('linea','tipolinea.nombre')->sortable(),
+            Column::make('linea', 'tipolinea.nombre')->sortable(),
 
             Column::make('puerto', 'tipopuerto.nombre')->sortable(),
 
@@ -119,13 +124,61 @@ class ExportTableClosed extends DataTableComponent
 
             Column::make('renuncia')->collapseAlways(),
             Column::make('ultima actualizacion', 'updated_at')->collapseAlways(),
-              Column::make('Fecha de Creacion', 'created_at')->collapseAlways(),
-            Column::make('Fecha de pago','fecha_pago')
-            ->sortable(),
-            Column::make('Fecha de entrega','fecha_entrega')
-            ->sortable(),
-            Column::make('Fecha veconinter','fecha_veconinter')
-            ->sortable(),
+            Column::make('Fecha de Creacion', 'created_at')->collapseAlways(),
+            Column::make('Fecha de pago', 'fecha_pago')
+                ->sortable(),
+            Column::make('Fecha de entrega', 'fecha_entrega')
+                ->sortable(),
+            Column::make('Fecha veconinter', 'fecha_veconinter')
+                ->sortable(),
+            Column::make('Fecha Despacho', 'fecha_despacho')
+                ->sortable(),
+            Column::make('Fecha Devolucion', 'fecha_devolucion')
+                ->sortable(),
+            Column::make('Fecha Arribo', 'fecha_arribo')
+                ->sortable(),
+            Column::make('Fecha Registro', 'fecha_registro')
+                ->sortable(),
+            Column::make('Fecha pago impuestos', 'fecha_impuesto')
+                ->sortable(),
+            Column::make('Base', 'base')
+                ->sortable(),
+            Column::make('Fecha Validacion', 'fecha_validacion')
+                ->sortable(),
+            Column::make('Color', 'colors.nombre')
+                ->sortable(),
+            Column::make('Funcionario', 'funcionario')
+                ->sortable(),
+            Column::make('Almacen', 'almacen')
+                ->sortable(),
+            Column::make('Fecha Presentacion', 'fecha_presentacion')
+                ->sortable(),
+            Column::make('Fecha Reconocimiento', 'fecha_reconocimiento')
+                ->sortable(),
+
+            Column::make('Factura', 'factura')
+                ->sortable(),
+            Column::make('Fecha Factura', 'fecha_factura')
+                ->sortable(),
+            Column::make('Dias Libres', 'dias_libres')
+                ->sortable(),
+            Column::make('Cliente tiene poder', 'poder')
+                ->sortable()->format(function ($value) {
+                    return $value == 2 ? 'SI' : 'NO';
+                }),
+            Column::make('Cantidad Equipos', 'cantidad_equipos')
+                ->sortable(),
+
+            Column::make('Descripcion', 'descripcion')
+                ->sortable(),
+            Column::make('Peso', 'peso')
+                ->sortable(),
+
+            Column::make('Autorizado Imprimir BL', 'autorizado')
+                ->sortable()->format(function ($value) {
+                    return $value == 2 ? 'SI' : 'NO';
+                }),
+
             Column::make('Actions')->label(
                 fn($row, Column $column) => view('livewire.estatus', [
                     'valor' => 'BOTON',
@@ -141,7 +194,7 @@ class ExportTableClosed extends DataTableComponent
         ];
     }
 
-
+  
     public function filters(): array
     {
         return [
@@ -179,6 +232,14 @@ class ExportTableClosed extends DataTableComponent
                 ])
                 ->filter(function (Builder $builder, string $value) {
                     $builder->where('expediente', 'like', '%' . $value . '%');
+                }),
+
+            TextFilter::make('dua')
+                ->config([
+                    'placeholder' => 'Buscar DUA',
+                ])
+                ->filter(function (Builder $builder, string $value) {
+                    $builder->where('dua', 'like', '%' . $value . '%');
                 }),
 
             TextFilter::make('contenedor')

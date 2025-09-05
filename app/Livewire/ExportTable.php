@@ -21,9 +21,10 @@ class ExportTable extends DataTableComponent
 
     public function configure(): void
     {
+
         $this->setPrimaryKey('id');
         $this->setSearchDisabled();
-        $this->setFiltersVisibilityStatus(false);
+        $this->setFiltersVisibilityStatus(true);
         $this->setPerPageVisibilityStatus(false);
         $this->setPerPageAccepted([100]);
         $this->setLoadingPlaceholderStatus(true);
@@ -72,6 +73,9 @@ class ExportTable extends DataTableComponent
 
             return [];
         });
+
+        $this->setFilterLayoutSlideDown();
+        $this->setFilterSlideDownDefaultStatusEnabled();
     }
 
     public function columns(): array
@@ -79,26 +83,26 @@ class ExportTable extends DataTableComponent
         return [
             Column::make('id')->excludeFromColumnSelect()->hideIf(true)
                 ->sortable(),
-            Column::make('Dua', 'dua')->secondaryHeader($this->getFilterByKey('dua'))
+            Column::make('Dua', 'dua')
                 ->sortable(),
-            Column::make('expediente')->secondaryHeader($this->getFilterByKey('expediente'))
+            Column::make('expediente')
                 ->sortable(),
-            Column::make('consignatario')->secondaryHeader($this->getFilterByKey('consignatario'))
+            Column::make('consignatario')
                 ->sortable(),
-            Column::make('bl')->secondaryHeader($this->getFilterByKey('bl'))
+            Column::make('bl')
                 ->sortable(),
             Column::make('tipo')->collapseAlways()
                 ->sortable(),
-            Column::make('contenedor')->secondaryHeader($this->getFilterByKey('contenedor'))
+            Column::make('contenedor')
                 ->sortable(),
             Column::make('eta')
-                ->secondaryHeader($this->getFilterByKey('fecha'))
+
                 ->sortable(),
 
-            Column::make('motonave')->secondaryHeader($this->getFilterByKey('motonave'))
+            Column::make('motonave')
                 ->sortable(),
 
-            Column::make('cliente')->secondaryHeader($this->getFilterByKey('cliente'))
+            Column::make('cliente')
                 ->sortable(),
 
             Column::make('linea')->hideIf(true),
@@ -106,12 +110,12 @@ class ExportTable extends DataTableComponent
 
             Column::make('puerto', 'tipopuerto.nombre')->sortable(),
 
-            Column::make('envio', 'tipoenvio.nombre')->secondaryHeader($this->getFilterByKey('envio'))
+            Column::make('envio', 'tipoenvio.nombre')
                 ->sortable(),
-            Column::make('estatus', 'tipoestatus.nombre')->secondaryHeader($this->getFilterByKey('estatus'))
+            Column::make('estatus', 'tipoestatus.nombre')
                 ->sortable(),
 
-            Column::make('liberacion')->secondaryHeader($this->getFilterByKey('liberacion'))
+            Column::make('liberacion')
                 ->sortable()->format(function ($value) {
                     return $value == 1 ? 'Sí' : 'No';
                 }),
@@ -120,7 +124,7 @@ class ExportTable extends DataTableComponent
                 return $value == 1 ? 'Sí' : 'No';
             }),
 
-            Column::make('obs')->secondaryHeader($this->getFilterByKey('obs'))->collapseAlways(),
+            Column::make('obs')->collapseAlways(),
 
             Column::make('renuncia')->collapseAlways(),
             Column::make('ultima actualizacion', 'updated_at')->collapseAlways(),
@@ -198,9 +202,9 @@ class ExportTable extends DataTableComponent
     public function filters(): array
     {
         return [
-            DateRangeFilter::make('fecha')
+            DateRangeFilter::make('Eta')
                 ->config([
-                    'allowInput' => true,   // Allow manual input of dates
+                    'allowInput' => true,
                     'placeholder' => 'Ingrese Fecha', // A placeholder value
                 ])
                 ->setFilterPillValues([0 => 'minDate', 1 => 'maxDate']) // The values that will be displayed for the Min/Max Date Values
@@ -208,6 +212,152 @@ class ExportTable extends DataTableComponent
                     $builder
                         ->whereDate('eta', '>=', $dateRange['minDate']) // minDate is the start date selected
                         ->whereDate('eta', '<=', $dateRange['maxDate']); // maxDate is the end date selected
+                }),
+
+            DateRangeFilter::make('Fecha de pago')
+                ->config([
+                    'allowInput' => true,
+                    'placeholder' => 'Ingrese Fecha', // A placeholder value
+                ])
+                ->setFilterPillValues([0 => 'minDate', 1 => 'maxDate']) // The values that will be displayed for the Min/Max Date Values
+                ->filter(function (Builder $builder, array $dateRange) { // Expects an array.
+                    $builder
+                        ->whereDate('fecha_pago', '>=', $dateRange['minDate']) // minDate is the start date selected
+                        ->whereDate('fecha_pago', '<=', $dateRange['maxDate']); // maxDate is the end date selected
+                }),
+
+            DateRangeFilter::make('Fecha de Entrega')
+                ->config([
+                    'allowInput' => true,
+                    'placeholder' => 'Ingrese Fecha', // A placeholder value
+                ])
+                ->setFilterPillValues([0 => 'minDate', 1 => 'maxDate']) // The values that will be displayed for the Min/Max Date Values
+                ->filter(function (Builder $builder, array $dateRange) { // Expects an array.
+                    $builder
+                        ->whereDate('fecha_entrega', '>=', $dateRange['minDate']) // minDate is the start date selected
+                        ->whereDate('fecha_entrega', '<=', $dateRange['maxDate']); // maxDate is the end date selected
+                }),
+
+            DateRangeFilter::make('Fecha Vecointer')
+                ->config([
+                    'allowInput' => true,
+                    'placeholder' => 'Ingrese Fecha', // A placeholder value
+                ])
+                ->setFilterPillValues([0 => 'minDate', 1 => 'maxDate']) // The values that will be displayed for the Min/Max Date Values
+                ->filter(function (Builder $builder, array $dateRange) { // Expects an array.
+                    $builder
+                        ->whereDate('fecha_veconinter', '>=', $dateRange['minDate']) // minDate is the start date selected
+                        ->whereDate('fecha_veconinter', '<=', $dateRange['maxDate']); // maxDate is the end date selected
+                }),
+
+
+            DateRangeFilter::make('Fecha Despacho')
+                ->config([
+                    'allowInput' => true,
+                    'placeholder' => 'Ingrese Fecha', // A placeholder value
+                ])
+                ->setFilterPillValues([0 => 'minDate', 1 => 'maxDate']) // The values that will be displayed for the Min/Max Date Values
+                ->filter(function (Builder $builder, array $dateRange) { // Expects an array.
+                    $builder
+                        ->whereDate('fecha_despacho', '>=', $dateRange['minDate']) // minDate is the start date selected
+                        ->whereDate('fecha_despacho', '<=', $dateRange['maxDate']); // maxDate is the end date selected
+                }),
+
+            DateRangeFilter::make('Fecha Devolucion')
+                ->config([
+                    'allowInput' => true,
+                    'placeholder' => 'Ingrese Fecha', // A placeholder value
+                ])
+                ->setFilterPillValues([0 => 'minDate', 1 => 'maxDate']) // The values that will be displayed for the Min/Max Date Values
+                ->filter(function (Builder $builder, array $dateRange) { // Expects an array.
+                    $builder
+                        ->whereDate('fecha_devolucion', '>=', $dateRange['minDate']) // minDate is the start date selected
+                        ->whereDate('fecha_devolucion', '<=', $dateRange['maxDate']); // maxDate is the end date selected
+                }),
+
+            DateRangeFilter::make('Fecha Arribo')
+                ->config([
+                    'allowInput' => true,
+                    'placeholder' => 'Ingrese Fecha', // A placeholder value
+                ])
+                ->setFilterPillValues([0 => 'minDate', 1 => 'maxDate']) // The values that will be displayed for the Min/Max Date Values
+                ->filter(function (Builder $builder, array $dateRange) { // Expects an array.
+                    $builder
+                        ->whereDate('fecha_arribo', '>=', $dateRange['minDate']) // minDate is the start date selected
+                        ->whereDate('fecha_arribo', '<=', $dateRange['maxDate']); // maxDate is the end date selected
+                }),
+
+            DateRangeFilter::make('Fecha Registro')
+                ->config([
+                    'allowInput' => true,
+                    'placeholder' => 'Ingrese Fecha', // A placeholder value
+                ])
+                ->setFilterPillValues([0 => 'minDate', 1 => 'maxDate']) // The values that will be displayed for the Min/Max Date Values
+                ->filter(function (Builder $builder, array $dateRange) { // Expects an array.
+                    $builder
+                        ->whereDate('fecha_registro', '>=', $dateRange['minDate']) // minDate is the start date selected
+                        ->whereDate('fecha_registro', '<=', $dateRange['maxDate']); // maxDate is the end date selected
+                }),
+
+            DateRangeFilter::make('Fecha Impuesto')
+                ->config([
+                    'allowInput' => true,
+                    'placeholder' => 'Ingrese Fecha', // A placeholder value
+                ])
+                ->setFilterPillValues([0 => 'minDate', 1 => 'maxDate']) // The values that will be displayed for the Min/Max Date Values
+                ->filter(function (Builder $builder, array $dateRange) { // Expects an array.
+                    $builder
+                        ->whereDate('fecha_impuesto', '>=', $dateRange['minDate']) // minDate is the start date selected
+                        ->whereDate('fecha_impuesto', '<=', $dateRange['maxDate']); // maxDate is the end date selected
+                }),
+
+            DateRangeFilter::make('Fecha Presentación')
+                ->config([
+                    'allowInput' => true,
+                    'placeholder' => 'Ingrese Fecha', // A placeholder value
+                ])
+                ->setFilterPillValues([0 => 'minDate', 1 => 'maxDate']) // The values that will be displayed for the Min/Max Date Values
+                ->filter(function (Builder $builder, array $dateRange) { // Expects an array.
+                    $builder
+                        ->whereDate('fecha_presentacion', '>=', $dateRange['minDate']) // minDate is the start date selected
+                        ->whereDate('fecha_presentacion', '<=', $dateRange['maxDate']); // maxDate is the end date selected
+                }),
+
+            DateRangeFilter::make('Fecha Reconocimiento')
+                ->config([
+                    'allowInput' => true,
+                    'placeholder' => 'Ingrese Fecha', // A placeholder value
+                ])
+                ->setFilterPillValues([0 => 'minDate', 1 => 'maxDate']) // The values that will be displayed for the Min/Max Date Values
+                ->filter(function (Builder $builder, array $dateRange) { // Expects an array.
+                    $builder
+                        ->whereDate('fecha_reconocimiento', '>=', $dateRange['minDate']) // minDate is the start date selected
+                        ->whereDate('fecha_reconocimiento', '<=', $dateRange['maxDate']); // maxDate is the end date selected
+                }),
+
+            DateRangeFilter::make('Fecha Validación')
+                ->config([
+                    'allowInput' => true,
+                    'placeholder' => 'Ingrese Fecha', // A placeholder value
+                ])
+                ->setFilterPillValues([0 => 'minDate', 1 => 'maxDate']) // The values that will be displayed for the Min/Max Date Values
+                ->filter(function (Builder $builder, array $dateRange) { // Expects an array.
+                    $builder
+                        ->whereDate('fecha_validacion', '>=', $dateRange['minDate']) // minDate is the start date selected
+                        ->whereDate('fecha_validacion', '<=', $dateRange['maxDate']); // maxDate is the end date selected
+                }),
+
+
+            DateRangeFilter::make('Fecha Factura')
+                ->config([
+                    'allowInput' => true,
+                    'placeholder' => 'Ingrese Fecha', // A placeholder value
+                ])
+                ->setFilterPillValues([0 => 'minDate', 1 => 'maxDate']) // The values that will be displayed for the Min/Max Date Values
+                ->filter(function (Builder $builder, array $dateRange) { // Expects an array.
+                    $builder
+                        ->whereDate('fecha_factura', '>=', $dateRange['minDate']) // minDate is the start date selected
+                        ->whereDate('fecha_factura', '<=', $dateRange['maxDate']); // maxDate is the end date selected
                 }),
 
             TextFilter::make('Cliente')
